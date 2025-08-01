@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class BookLoan extends Model
 {
     protected $fillable = [
-        'user_id', 'book_id', 'loan_date', 'due_date', 'status', 'total_price'
+        'user_id', 'book_item_id', 'loan_date', 'due_date', 'status', 'total_price'
     ];
 
     public function user()
@@ -15,9 +15,9 @@ class BookLoan extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function book()
+    public function bookItem()
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(BookItem::class, 'book_item_id');
     }
 
     public function return()
