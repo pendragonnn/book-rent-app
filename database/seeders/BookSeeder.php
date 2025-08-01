@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\BookItem;
+use App\Models\Book;
 
 class BookSeeder extends Seeder
 {
@@ -133,13 +135,27 @@ class BookSeeder extends Seeder
             ],
         ];
 
-        foreach ($books as $book) {
-            DB::table('books')->updateOrInsert(
-                ['isbn' => $book['isbn']],
-                array_merge($book, [
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+        foreach ($books as $data) {
+            $stock = $data['stock'];
+            unset($data['stock']); 
+
+            // insert books
+            $book = Book::updateOrCreate(
+                ['isbn' => $data['isbn']],
+                array_merge($data, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ])
+            );
+        }
+
+        // insert book items 
+        for ($i = 0; $i < $stock; $i++) {
+            BookItem::updateOrCreate(
+                [
+                    'book_id' => $book->id,
+                    'status' => 'available',
+                ]
             );
         }
     }

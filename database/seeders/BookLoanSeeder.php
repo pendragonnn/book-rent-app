@@ -3,38 +3,36 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use App\Models\Book;
+use App\Models\BookItem;
 use App\Models\User;
+use App\Models\BookLoan;
 use Carbon\Carbon;
 
 class BookLoanSeeder extends Seeder
 {
     public function run(): void
     {
-        $books = Book::pluck('id')->toArray();
         $members = User::where('role_id', 2)->pluck('id')->toArray();
+        $bookItems = BookItem::where('status', 'available')->inRandomOrder()->take(10)->get();
 
-        foreach (range(1, 10) as $i) {
+        foreach ($bookItems as $bookItem) {
             $loanDate = Carbon::now()->subDays(rand(5, 30));
-            $dueDate = $loanDate->copy()->addDays(7); // default pinjam 7 hari
-            $isReturned = rand(0, 1);
-            $status = $isReturned ? 'returned' : 'borrowed';
-
-            $bookId = fake()->randomElement($books);
-            $book = Book::find($bookId);
+            $dueDate = $loanDate->copy()->addDays(7);
+            $statusList = ['payment_pending', 'admin_validation', 'borrowed', 'returned', 'cancelled'];
+            $status = fake()->randomElement($statusList);
+            $isReturned = $status === 'returned';
 
             $days = $isReturned
                 ? $loanDate->diffInDays($dueDate)
                 : $loanDate->diffInDays(now());
 
-            $price = $book->rental_price * ($days ?: 1);
+            $price = $bookItem->book->rental_price * ($days ?: 1);
 
-            DB::table('book_loans')->updateOrInsert(
+            BookLoan::updateOrCreate(
                 [
+                    'book_item_id' => $bookItem->id,
                     'user_id' => fake()->randomElement($members),
-                    'book_id' => $bookId,
-                    'loan_date' => $loanDate->toDateString()
+                    'loan_date' => $loanDate->toDateString(),
                 ],
                 [
                     'due_date' => $dueDate->toDateString(),
@@ -44,6 +42,10 @@ class BookLoanSeeder extends Seeder
                     'updated_at' => now(),
                 ]
             );
+
+            if (in_array($status, ['borrowed', 'admin_validation', 'payment_pending'])) {
+                $bookItem->update(['status' => 'borrowed']);
+            }
         }
     }
 }
