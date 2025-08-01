@@ -39,7 +39,8 @@
               <p><strong>ISBN:</strong> {{ $book->isbn ?? '-' }}</p>
               <p><strong>Category:</strong> {{ $book->category->name ?? '-' }}</p>
               <p><strong>Rental Price:</strong> Rp{{ number_format($book->rental_price, 0, ',', '.') }}</p>
-              <p><strong>Stock:</strong> {{ $book->stock }}</p>
+              <p><strong>Available Stock:</strong> {{ $book->items->where('status', 'available')->count() }}</p>
+              <p><strong>Total Stock:</strong> {{ $book->items->count() }}</p>
               <p><strong>Description:</strong></p>
               <p class="text-justify">{{ $book->description ?? 'No description available.' }}</p>
             </div>
