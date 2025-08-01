@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\Admin\BookController;
+use App\Http\Controllers\Admin\CategoryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,6 +28,7 @@ Route::middleware(['auth', CheckRole::class.':admin'])
         Route::get('/dashboard', fn () => view('dashboard.admin'))->name('dashboard');
         Route::get('/catalog', [BookController::class, 'index'])->name('catalog');
         Route::resource('books', BookController::class);
+        Route::resource('categories', CategoryController::class);
     });
 
 Route::middleware(['auth', CheckRole::class.':member'])
