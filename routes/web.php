@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\BookController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
+use App\Http\Controllers\Admin\BookController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,6 +26,7 @@ Route::middleware(['auth', CheckRole::class.':admin'])
     ->group(function () {
         Route::get('/dashboard', fn () => view('dashboard.admin'))->name('dashboard');
         Route::get('/catalog', [BookController::class, 'index'])->name('catalog');
+        Route::resource('books', BookController::class);
     });
 
 Route::middleware(['auth', CheckRole::class.':member'])
@@ -33,7 +34,7 @@ Route::middleware(['auth', CheckRole::class.':member'])
     ->name('member.')
     ->group(function () {
         Route::get('/dashboard', fn () => view('dashboard.member'))->name('dashboard');
-        Route::get('/catalog', [BookController::class, 'index'])->name('catalog');
+        // Route::get('/catalog', [BookController::class, 'index'])->name('catalog');
     });
 
 
