@@ -33,7 +33,8 @@
                             <th class="px-4 py-2 text-left font-medium text-gray-700">Author</th>
                             <th class="px-4 py-2 text-left font-medium text-gray-700">Category</th>
                             <th class="px-4 py-2 text-left font-medium text-gray-700">Price</th>
-                            <th class="px-4 py-2 text-left font-medium text-gray-700">Stock</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Stock Available</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Total Stock</th>
                             <th class="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
                         </tr>
                     </thead>
@@ -44,7 +45,8 @@
                                 <td class="px-4 py-2">{{ $book->author }}</td>
                                 <td class="px-4 py-2">{{ $book->category->name ?? '-' }}</td>
                                 <td class="px-4 py-2">Rp{{ number_format($book->rental_price, 0, ',', '.') }}</td>
-                                <td class="px-4 py-2">{{ $book->stock }}</td>
+                                <td class="px-4 py-2">{{ $book->items->where('status', 'borrowed')->count() }}</td>
+                                <td class="px-4 py-2">{{ $book->items->count() }}</td>
                                 <td class="px-4 py-2 space-x-2">
                                     <a href="{{ route('admin.books.show', $book) }}"
                                         class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
@@ -68,7 +70,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h2 class="text-xl font-semibold mb-4 text-red-600">Are you sure?</h2>
             <p class="mb-4 text-gray-700">This action will permanently delete the book.</p>
@@ -101,6 +103,7 @@
                 const form = document.getElementById('deleteForm');
                 form.action = `/admin/books/${bookId}`;
                 document.getElementById('deleteModal').classList.remove('hidden');
+                document.getElementById('deleteModal').classList.add('flex');
             }
 
             function closeDeleteModal() {

@@ -86,7 +86,7 @@
                     {{-- Stock --}}
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">Stock</label>
-                        <input type="number" name="stock" min="0" value="{{ old('stock', $book->stock) }}"
+                        <input type="number" name="stock" min="0" value="{{ old('stock', $book->items->count()) }}"
                                class="form-input w-full mt-1 rounded-md shadow-sm border-gray-300" required>
                         @error('stock') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>

@@ -38,7 +38,6 @@ class BookController extends Controller
             'isbn' => 'nullable|string|max:50',
             'category_id' => 'required|exists:categories,id',
             'rental_price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
             'cover_image' => 'nullable|image|max:2048',
         ]);
 
@@ -48,7 +47,13 @@ class BookController extends Controller
             $validated['cover_image'] = $filename;
         }
 
-        Book::create($validated);
+        $book = Book::create($validated);
+        if ($request->filled('stock') && is_numeric($request->stock)) {
+            for ($i = 0; $i < $request->stock; $i++) {
+                $book->items()->create(['status' => 'available']);
+            }
+        }
+
         return redirect()->route('admin.books.index')->with('success', 'Book added successfully!');
     }
 
@@ -69,7 +74,6 @@ class BookController extends Controller
             'isbn' => 'nullable|string|max:50',
             'category_id' => 'required|exists:categories,id',
             'rental_price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
             'cover_image' => 'nullable|image|max:2048',
         ]);
 
@@ -80,6 +84,19 @@ class BookController extends Controller
         }
 
         $book->update($validated);
+
+        if ($request->filled('stock') && is_numeric($request->stock)) {
+            $currentStock = $book->items()->count();
+            $newStock = intval($request->stock);
+
+            if ($newStock > $currentStock) {
+                $difference = $newStock - $currentStock;
+                for ($i = 0; $i < $difference; $i++) {
+                    $book->items()->create(['status' => 'available']);
+                }
+            }
+        }
+
         return redirect()->route('admin.books.index')->with('success', 'Book updated successfully!');
     }
 
