@@ -7,8 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Book extends Model
 {
     protected $fillable = [
-        'title', 'author', 'description', 'publisher', 'year', 'isbn',
-        'category_id', 'rental_price', 'stock', 'cover_image',
+        'title',
+        'author',
+        'description',
+        'publisher',
+        'year',
+        'isbn',
+        'category_id',
+        'rental_price',
+        'stock',
+        'cover_image',
     ];
 
     public function category()
@@ -18,6 +26,11 @@ class Book extends Model
 
     public function loans()
     {
-        return $this->hasMany(BookLoan::class);
+        return $this->hasManyThrough(BookLoan::class, BookItem::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(BookItem::class);
     }
 }
