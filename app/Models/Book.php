@@ -15,7 +15,6 @@ class Book extends Model
         'isbn',
         'category_id',
         'rental_price',
-        'stock',
         'cover_image',
     ];
 
