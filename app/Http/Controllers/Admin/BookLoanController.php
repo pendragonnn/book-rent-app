@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\BookLoan;
+use App\Models\BookItem;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class BookLoanController extends Controller
+{
+    public function index()
+    {
+        $statuses = ['payment_pending', 'admin_validation', 'borrowed', 'returned', 'cancelled'];
+        $loans = BookLoan::with(['user', 'bookItem.book'])->latest()->get();
+        return view('admin.book_loans.index', compact('loans', 'statuses'));
+    }
+
+    public function create()
+    {
+        $users = User::where('role_id', 2)->get();
+        $bookItems = BookItem::where('status', 'available')->get();
+        return view('admin.book_loans.create', compact('users', 'bookItems'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'book_item_id' => 'required|exists:book_items,id',
+            'loan_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:loan_date',
+            'status' => 'required|in:payment_pending,admin_validation,borrowed,returned,cancelled',
+            'total_price' => 'required|numeric|min:0'
+        ]);
+
+        BookLoan::create($validated);
+        BookItem::find($validated['book_item_id'])->update(['status' => 'borrowed']);
+
+        return redirect()->route('admin.book-loans.index')->with('success', 'Loan created.');
+    }
+
+    public function show(BookLoan $bookLoan)
+    {
+        $bookLoan->load(['user', 'bookItem.book']);
+        return view('admin.book_loans.show', compact('bookLoan'));
+    }
+
+    public function edit(BookLoan $bookLoan)
+    {
+        $users = User::where('role_id', 2)->get();
+        $bookLoan->load(['user', 'bookItem.book']);
+        $bookItems = BookItem::where('status', 'available')->get();
+        $statuses = ['payment_pending', 'admin_validation', 'borrowed', 'returned', 'cancelled'];
+        return view('admin.book_loans.edit', compact('bookLoan', 'statuses', 'users', 'bookItems'));
+    }
+
+    public function update(Request $request, BookLoan $bookLoan)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'book_item_id' => 'required|exists:book_items,id',
+            'loan_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:loan_date',
+            'status' => 'required|in:payment_pending,admin_validation,borrowed,returned,cancelled',
+            'total_price' => 'required|numeric|min:0'
+        ]);
+
+        $bookLoan->update($validated);
+        return redirect()->route('admin.book-loans.index')->with('success', 'Loan updated.');
+    }
+
+    public function destroy(BookLoan $bookLoan)
+    {
+        $bookLoan->delete();
+        return redirect()->route('admin.book-loans.index')->with('success', 'Loan deleted.');
+    }
+}

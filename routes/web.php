@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BookLoanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,7 @@ Route::middleware(['auth', CheckRole::class.':admin'])
         Route::resource('books', BookController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('users', UserController::class);
+        Route::resource('book-loans', BookLoanController::class);
     });
 
 Route::middleware(['auth', CheckRole::class.':member'])
