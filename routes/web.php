@@ -8,6 +8,7 @@ use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\DashboardController as adminDashboard;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,7 +28,7 @@ Route::middleware(['auth', CheckRole::class.':admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/dashboard', fn () => view('dashboard.admin'))->name('dashboard');
+        Route::get('/dashboard', [adminDashboard::class, 'index'])->name('dashboard');
         Route::get('/catalog', [BookController::class, 'index'])->name('catalog');
         Route::resource('books', BookController::class);
         Route::resource('categories', CategoryController::class);
