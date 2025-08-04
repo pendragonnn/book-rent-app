@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\DashboardController as adminDashboard;
+use App\Http\Controllers\Member\DashboardController as memberDashboard;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,8 +41,7 @@ Route::middleware(['auth', CheckRole::class.':member'])
     ->prefix('member')
     ->name('member.')
     ->group(function () {
-        Route::get('/dashboard', fn () => view('dashboard.member'))->name('dashboard');
-        // Route::get('/catalog', [BookController::class, 'index'])->name('catalog');
+        Route::get('/dashboard', [memberDashboard::class, 'index'])->name('dashboard');
     });
 
 
