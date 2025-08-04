@@ -58,6 +58,20 @@ class BookLoanController extends Controller
 
     public function update(Request $request, BookLoan $bookLoan)
     {
+        $status = $request->input('status');
+
+        if ($status === 'borrowed' && $bookLoan->status === 'admin_validation') {
+            $bookLoan->update(['status' => 'borrowed']);
+            $bookLoan->bookItem->update(['status' => 'borrowed']);
+            return redirect()->route('admin.book-loans.index')->with('success', 'Loan approved.');
+        }
+        
+        if ($status === 'cancelled' && $bookLoan->status === 'admin_validation') {
+            $bookLoan->update(['status' => 'cancelled']);
+            $bookLoan->bookItem->update(['status' => 'available']);
+            return redirect()->route('admin.book-loans.index')->with('success', 'Loan cancelled.');
+        }
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'book_item_id' => 'required|exists:book_items,id',
@@ -68,6 +82,11 @@ class BookLoanController extends Controller
         ]);
 
         $bookLoan->update($validated);
+
+        if ($validated['status'] === 'borrowed') {
+            $bookLoan->bookItem->update(['status' => 'borrowed']);
+        }
+
         return redirect()->route('admin.book-loans.index')->with('success', 'Loan updated.');
     }
 

@@ -69,6 +69,7 @@
                 View
               </a>
               @if ($loan->status === 'admin_validation')
+            {{-- Approve --}}
             <form action="{{ route('admin.book-loans.update', $loan) }}" method="POST" class="inline">
             @csrf
             @method('PUT')
@@ -78,7 +79,17 @@
             </button>
             </form>
 
+            {{-- Cancel --}}
+            <form action="{{ route('admin.book-loans.update', $loan) }}" method="POST" class="inline">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="status" value="cancelled">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+            Cancel
+            </button>
+            </form>
           @endif
+
               <a href="{{ route('admin.book-loans.edit', $loan) }}"
                 class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">
                 Edit
