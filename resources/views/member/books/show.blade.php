@@ -10,9 +10,8 @@
       <div class="bg-white shadow-md rounded-lg p-6 flex flex-col md:flex-row gap-6">
         {{-- Book Cover --}}
         <div class="flex-shrink-0">
-          <img src="{{ asset('covers/' . $book->cover_image) }}"
-               alt="{{ $book->title }}"
-               class="w-48 h-auto rounded shadow">
+          <img src="{{ asset('covers/' . $book->cover_image) }}" alt="{{ $book->title }}"
+            class="w-48 h-auto rounded shadow">
         </div>
 
         {{-- Book Info --}}
@@ -25,21 +24,19 @@
 
           <div class="mt-4">
             <a href="{{ route('member.books.index') }}"
-               class="inline-block bg-gray-500 hover:bg-gray-600 text-white text-sm px-4 py-2 rounded">
+              class="inline-block bg-gray-500 hover:bg-gray-600 text-white text-sm px-4 py-2 rounded">
               Back to Catalog
             </a>
 
-            @if ($book->availableItemsCount() > 0)
-              <form action="#" method="POST" class="inline-block ml-2">
-                @csrf
-                <button type="submit"
-                        class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
-                  Pinjam Buku
-                </button>
-              </form>
-            @else
-              <span class="text-red-600 text-sm font-semibold ml-2">Tidak tersedia</span>
-            @endif
+            @if ($book->items->where('status', 'available')->count() > 0)
+        @php $item = $book->items->where('status', 'available')->first(); @endphp
+        <a href="{{ route('member.book-loans.create', $availableItem->id) }}"
+          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+          Pinjam Buku Ini
+        </a>
+      @else
+        <span class="text-gray-500">Buku tidak tersedia</span>
+      @endif
           </div>
         </div>
       </div>
