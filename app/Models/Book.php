@@ -18,6 +18,11 @@ class Book extends Model
         'cover_image',
     ];
 
+    public function availableItemsCount()
+    {
+        return $this->items()->where('status', 'available')->count();
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
