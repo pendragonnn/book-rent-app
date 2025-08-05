@@ -30,7 +30,7 @@
 
             @if ($book->items->where('status', 'available')->count() > 0)
         @php $item = $book->items->where('status', 'available')->first(); @endphp
-        <a href="{{ route('member.book-loans.create', $availableItem->id) }}"
+        <a href="{{ route('member.book-loans.create', $item->id) }}"
           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
           Pinjam Buku Ini
         </a>
