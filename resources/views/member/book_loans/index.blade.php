@@ -22,76 +22,82 @@
           </thead>
           <tbody class="divide-y divide-gray-200">
             @forelse ($loans as $loan)
-            @php
-            $statusColor = match ($loan->status) {
-            'payment_pending' => 'bg-blue-500',
-            'admin_validation' => 'bg-indigo-500',
-            'borrowed' => 'bg-yellow-500',
-            'returned' => 'bg-green-500',
-            'cancelled' => 'bg-red-500',
-            default => 'bg-gray-500',
-            };
-          @endphp
-            <tr>
-              <td class="px-4 py-2">
-              {{ $loan->bookItem->book->title ?? '-' }}
-              </td>
-              <td class="px-4 py-2">{{ $loan->loan_date }}</td>
-              <td class="px-4 py-2">{{ $loan->due_date }}</td>
-              <td class="px-4 py-2">
-              <span class="px-2 py-1 text-white text-xs font-semibold rounded {{ $statusColor }}">
-                {{ ucwords(str_replace('_', ' ', $loan->status)) }}
-              </span>
-              </td>
-              <td class="px-4 py-2">
-              @if ($loan->payment_proof)
-              <div class="flex items-center space-x-2">
-              <a href="{{ asset('storage/' . $loan->payment_proof) }}" target="_blank"
-              class="text-blue-600 underline text-sm">
-              View Proof
-              </a>
+          @php
+          $statusColor = match ($loan->status) {
+          'payment_pending' => 'bg-blue-500',
+          'admin_validation' => 'bg-indigo-500',
+          'borrowed' => 'bg-yellow-500',
+          'returned' => 'bg-green-500',
+          'cancelled' => 'bg-red-500',
+          default => 'bg-gray-500',
+          };
+        @endphp
+          <tr>
+            <td class="px-4 py-2">
+            {{ $loan->bookItem->book->title ?? '-' }}
+            </td>
+            <td class="px-4 py-2">{{ $loan->loan_date }}</td>
+            <td class="px-4 py-2">{{ $loan->due_date }}</td>
+            <td class="px-4 py-2">
+            <span class="px-2 py-1 text-white text-xs font-semibold rounded {{ $statusColor }}">
+              {{ ucwords(str_replace('_', ' ', $loan->status)) }}
+            </span>
+            </td>
+            <td class="px-4 py-2">
+            @if ($loan->payment_proof)
+            <div class="flex items-center space-x-2">
+            <a href="{{ asset('storage/' . $loan->payment_proof) }}" target="_blank"
+            class="text-blue-600 underline text-sm">
+            View Proof
+            </a>
 
-              @if ($loan->status === 'admin_validation')
-            <button onclick="openReuploadModal({{ $loan->id }})" class="text-xs text-yellow-600 underline">
-            Update Image
-            </button>
-            @endif
-              </div>
-          @elseif ($loan->status === 'payment_pending')
-
-            <button onclick="openUploadModal({{ $loan->id }})"
-            class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700">
-            Upload
-            </button>
-          @else
-            <span class="text-gray-400 text-xs">-</span>
+            @if ($loan->status === 'admin_validation')
+          <button onclick="openReuploadModal({{ $loan->id }})" class="text-xs text-yellow-600 underline">
+          Update Image
+          </button>
           @endif
-              </td>
+            </div>
+        @elseif ($loan->status === 'payment_pending')
 
-              <td class="px-4 py-2">
-              <a href="{{ route('member.books.show', $loan->bookItem->book_id) }}"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs rounded">
-                View Book
-              </a>
-              @if ($loan->status === 'payment_pending' || $loan->status === 'admin_validation')
-            <button onclick="openCancelModal({{ $loan->id }})"
-            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs rounded ml-2">
-            Cancel
-            </button>
-          @endif
+          <button onclick="openUploadModal({{ $loan->id }})"
+          class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700">
+          Upload
+          </button>
+        @else
+          <span class="text-gray-400 text-xs">-</span>
+        @endif
+            </td>
 
-              @if ($loan->status === 'borrowed')
-            <form action="{{ route('member.book-loans.return', $loan->id) }}" method="POST" class="inline">
-            @csrf
-            @method('PUT')
-            <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 text-xs rounded">
-            Return Book
-            </button>
-            </form>
-          @endif
+            <td class="px-4 py-2">
+            <a href="{{ route('member.book-loans.show', $loan->id) }}"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 text-xs rounded">
+              View Loan
+            </a>
 
-              </td>
-            </tr>
+            <a href="{{ route('member.book-loans.edit', $loan->id) }}"
+              class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 text-xs rounded ml-2">
+              Edit
+            </a>
+
+            @if ($loan->status === 'payment_pending' || $loan->status === 'admin_validation')
+          <button onclick="openCancelModal({{ $loan->id }})"
+          class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs rounded ml-2">
+          Cancel
+          </button>
+        @endif
+
+            @if ($loan->status === 'borrowed')
+          <form action="{{ route('member.book-loans.return', $loan->id) }}" method="POST" class="inline">
+          @csrf
+          @method('PUT')
+          <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 text-xs rounded">
+          Return Book
+          </button>
+          </form>
+        @endif
+
+            </td>
+          </tr>
       @empty
         <tr>
           <td colspan="6" class="text-center py-4 text-gray-600">

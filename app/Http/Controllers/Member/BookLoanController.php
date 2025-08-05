@@ -21,6 +21,15 @@ class BookLoanController extends Controller
     return view('member.book_loans.index', compact('loans', 'status'));
   }
 
+  public function show(BookLoan $bookLoan)
+  {
+    if ($bookLoan->user_id !== Auth::id()) {
+      abort(403);
+    }
+
+    return view('member.book_loans.show', compact('bookLoan'));
+  }
+
   public function create(BookItem $bookItem)
   {
     if ($bookItem->status !== 'available') {
@@ -44,18 +53,68 @@ class BookLoanController extends Controller
       return back()->with('error', 'Buku sudah dipinjam.');
     }
 
+    $start = \Carbon\Carbon::parse($validated['loan_date']);
+    $end = \Carbon\Carbon::parse($validated['due_date']);
+    $days = $start->diffInDays($end);
+
+    $pricePerDay = $bookItem->book->rental_price;
+    $totalPrice = $pricePerDay * $days;
+
     $loan = BookLoan::create([
       'user_id' => Auth::id(),
       'book_item_id' => $bookItem->id,
       'loan_date' => $validated['loan_date'],
       'due_date' => $validated['due_date'],
       'status' => 'payment_pending',
-      'total_price' => $bookItem->book->rental_price,
+      'total_price' => $totalPrice,
     ]);
 
     $bookItem->update(['status' => 'reserved']);
 
     return redirect()->route('member.dashboard')->with('success', 'Peminjaman berhasil diajukan.');
+  }
+
+  public function edit(BookLoan $bookLoan)
+  {
+    if ($bookLoan->user_id !== Auth::id()) {
+      abort(403);
+    }
+
+    if (!in_array($bookLoan->status, ['payment_pending', 'admin_validation'])) {
+      return back()->with('error', 'You can only edit loans that are in payment or validation phase.');
+    }
+
+    return view('member.book_loans.edit', compact('bookLoan'));
+  }
+
+  public function update(Request $request, BookLoan $bookLoan)
+  {
+    if ($bookLoan->user_id !== Auth::id()) {
+      abort(403);
+    }
+
+    if (!in_array($bookLoan->status, ['payment_pending', 'admin_validation'])) {
+      return back()->with('error', 'You can only update loans that are in payment or validation phase.');
+    }
+
+    $validated = $request->validate([
+      'loan_date' => 'required|date|after_or_equal:today',
+      'due_date' => 'required|date|after_or_equal:loan_date',
+    ]);
+
+    $start = \Carbon\Carbon::parse($validated['loan_date']);
+    $end = \Carbon\Carbon::parse($validated['due_date']);
+    $days = $start->diffInDays($end);
+    $pricePerDay = $bookLoan->bookItem->book->rental_price;
+    $totalPrice = $pricePerDay * $days;
+
+    $bookLoan->update([
+      'loan_date' => $validated['loan_date'],
+      'due_date' => $validated['due_date'],
+      'total_price' => $totalPrice,
+    ]);
+
+    return redirect()->route('member.book-loans.index')->with('success', 'Loan details updated.');
   }
 
   public function uploadPaymentProof(Request $request, BookLoan $bookLoan)

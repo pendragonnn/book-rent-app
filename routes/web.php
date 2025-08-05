@@ -54,6 +54,9 @@ Route::middleware(['auth', CheckRole::class . ':member'])
             ->name('book-loans.return');
         Route::put('/book-loans/{bookLoan}/cancel', [memberBookLoanController::class, 'cancel'])
             ->name('book-loans.cancel');
+        Route::get('/book-loans/{bookLoan}', [memberBookLoanController::class, 'show'])->name('book-loans.show');
+        Route::get('/book-loans/{bookLoan}/edit', [memberBookLoanController::class, 'edit'])->name('book-loans.edit');
+        Route::put('/book-loans/{bookLoan}', [memberBookLoanController::class, 'update'])->name('book-loans.update');
     });
 
 
