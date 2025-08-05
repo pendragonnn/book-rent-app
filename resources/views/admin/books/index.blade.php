@@ -45,7 +45,7 @@
                                 <td class="px-4 py-2">{{ $book->author }}</td>
                                 <td class="px-4 py-2">{{ $book->category->name ?? '-' }}</td>
                                 <td class="px-4 py-2">Rp{{ number_format($book->rental_price, 0, ',', '.') }}</td>
-                                <td class="px-4 py-2">{{ $book->items->where('status', 'borrowed')->count() }}</td>
+                                <td class="px-4 py-2">{{ $book->items->where('status', 'available')->count() }}</td>
                                 <td class="px-4 py-2">{{ $book->items->count() }}</td>
                                 <td class="px-4 py-2 space-x-2">
                                     <a href="{{ route('admin.books.show', $book) }}"
