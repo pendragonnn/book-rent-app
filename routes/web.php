@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\BookLoanController;
+use App\Http\Controllers\Admin\BookLoanController as adminBookLoanController;
+use App\Http\Controllers\Member\BookLoanController as memberBookLoanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -26,7 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', CheckRole::class.':admin'])
+Route::middleware(['auth', CheckRole::class . ':admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -35,16 +36,28 @@ Route::middleware(['auth', CheckRole::class.':admin'])
         Route::resource('books', adminBookController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('users', UserController::class);
-        Route::resource('book-loans', BookLoanController::class);
+        Route::resource('book-loans', adminBookLoanController::class);
     });
 
-Route::middleware(['auth', CheckRole::class.':member'])
+Route::middleware(['auth', CheckRole::class . ':member'])
     ->prefix('member')
     ->name('member.')
     ->group(function () {
         Route::get('/dashboard', [memberDashboard::class, 'index'])->name('dashboard');
         Route::resource('books', memberBookController::class);
+        Route::resource('book-loans', memberBookLoanController::class);
+        Route::get('/book-loans/create/{bookItem}', [memberBookLoanController::class, 'create'])->name('book-loans.create');
+        Route::post('/book-loans/store', [memberBookLoanController::class, 'store'])->name('book-loans.store');
+        Route::post('/book-loans/{bookLoan}/upload-payment-proof', [memberBookLoanController::class, 'uploadPaymentProof'])
+            ->name('book-loans.uploadPaymentProof');
+        Route::put('/book-loans/{bookLoan}/return', [memberBookLoanController::class, 'returnLoan'])
+            ->name('book-loans.return');
+        Route::put('/book-loans/{bookLoan}/cancel', [memberBookLoanController::class, 'cancel'])
+            ->name('book-loans.cancel');
+        Route::get('/book-loans/{bookLoan}', [memberBookLoanController::class, 'show'])->name('book-loans.show');
+        Route::get('/book-loans/{bookLoan}/edit', [memberBookLoanController::class, 'edit'])->name('book-loans.edit');
+        Route::put('/book-loans/{bookLoan}', [memberBookLoanController::class, 'update'])->name('book-loans.update');
     });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

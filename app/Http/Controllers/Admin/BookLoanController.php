@@ -7,6 +7,7 @@ use App\Models\BookLoan;
 use App\Models\BookItem;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookLoanController extends Controller
 {
@@ -27,18 +28,36 @@ class BookLoanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'book_item_id' => 'required|exists:book_items,id',
-            'loan_date' => 'required|date',
+            'loan_date' => 'required|date|after_or_equal:today',
             'due_date' => 'required|date|after_or_equal:loan_date',
-            'status' => 'required|in:payment_pending,admin_validation,borrowed,returned,cancelled',
-            'total_price' => 'required|numeric|min:0'
         ]);
 
-        BookLoan::create($validated);
-        BookItem::find($validated['book_item_id'])->update(['status' => 'borrowed']);
+        $bookItem = BookItem::findOrFail($validated['book_item_id']);
 
-        return redirect()->route('admin.book-loans.index')->with('success', 'Loan created.');
+        if ($bookItem->status !== 'available') {
+            return back()->with('error', 'Buku sudah dipinjam.');
+        }
+
+        $start = \Carbon\Carbon::parse($validated['loan_date']);
+        $end = \Carbon\Carbon::parse($validated['due_date']);
+        $days = $start->diffInDays($end);
+
+        $pricePerDay = $bookItem->book->rental_price;
+        $totalPrice = $pricePerDay * $days;
+
+        $loan = BookLoan::create([
+            'user_id' => Auth::id(),
+            'book_item_id' => $bookItem->id,
+            'loan_date' => $validated['loan_date'],
+            'due_date' => $validated['due_date'],
+            'status' => 'payment_pending',
+            'total_price' => $totalPrice,
+        ]);
+
+        $bookItem->update(['status' => 'reserved']);
+
+        return redirect()->route('member.dashboard')->with('success', 'Peminjaman berhasil diajukan.');
     }
 
     public function show(BookLoan $bookLoan)
@@ -65,7 +84,7 @@ class BookLoanController extends Controller
             $bookLoan->bookItem->update(['status' => 'borrowed']);
             return redirect()->route('admin.book-loans.index')->with('success', 'Loan approved.');
         }
-        
+
         if ($status === 'cancelled' && $bookLoan->status === 'admin_validation') {
             $bookLoan->update(['status' => 'cancelled']);
             $bookLoan->bookItem->update(['status' => 'available']);

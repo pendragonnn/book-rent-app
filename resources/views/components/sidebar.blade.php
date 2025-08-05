@@ -27,7 +27,7 @@
       <a href="{{ route('member.books.index') }}" class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('catalog.*') ? 'bg-gray-200 font-semibold' : '' }}">
         📚 Browse Books
       </a>
-      <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100">
+      <a href="{{ route('member.book-loans.index') }}" class="block px-3 py-2 rounded hover:bg-gray-100">
         📄 My Loans
       </a>
     @endif
