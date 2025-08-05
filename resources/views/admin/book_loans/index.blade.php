@@ -35,6 +35,7 @@
               <th class="px-4 py-2 text-left">Loan Date</th>
               <th class="px-4 py-2 text-left">Due Date</th>
               <th class="px-4 py-2 text-left">Total Price</th>
+              <th class="px-4 py-2 text-left">Payment Proof</th>
               <th class="px-4 py-2 text-left">Status</th>
               <th class="px-4 py-2 text-left">Actions</th>
             </tr>
@@ -59,6 +60,17 @@
               <td class="px-4 py-2">{{ $loan->due_date }}</td>
               <td class="px-4 py-2">Rp{{ number_format($loan->total_price, 0, ',', '.') }}</td>
               <td class="px-4 py-2">
+              @if ($loan->payment_proof)
+            <span class="text-green-600 font-medium text-sm">Paid</span>
+            <a href="{{ asset('storage/' . $loan->payment_proof) }}" target="_blank"
+            class="text-blue-600 underline text-sm">
+            View Proof
+            </a>
+          @else
+            <span class="text-red-500 font-medium text-sm">Unpaid</span>
+          @endif
+              </td>
+              <td>
               <span class="text-white px-2 py-1 rounded text-xs font-semibold {{ $badgeColor }}">
                 {{ $statusDisplay }}
               </span>

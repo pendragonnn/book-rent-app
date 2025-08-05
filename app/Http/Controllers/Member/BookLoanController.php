@@ -10,6 +10,17 @@ use Illuminate\Support\Facades\Auth;
 
 class BookLoanController extends Controller
 {
+  public function index()
+  {
+    $user = Auth::user();
+
+    $status = ['payment_pending', 'admin_validation', 'borrowed', 'returned', 'cancelled'];
+
+    $loans = BookLoan::with('bookItem.book')->where('user_id', $user->id)->latest()->paginate(10);
+
+    return view('member.book_loans.index', compact('loans', 'status'));
+  }
+
   public function create(BookItem $bookItem)
   {
     if ($bookItem->status !== 'available') {
@@ -46,4 +57,63 @@ class BookLoanController extends Controller
 
     return redirect()->route('member.dashboard')->with('success', 'Peminjaman berhasil diajukan.');
   }
+
+  public function uploadPaymentProof(Request $request, BookLoan $bookLoan)
+  {
+    if ($bookLoan->user_id !== Auth::id()) {
+      abort(403);
+    }
+
+    $request->validate([
+      'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+
+    $bookLoan->update([
+      'payment_proof' => $path,
+      'status' => 'admin_validation',
+    ]);
+
+    return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload!');
+  }
+
+  public function returnLoan(BookLoan $bookLoan)
+  {
+    if ($bookLoan->user_id !== Auth::id()) {
+      abort(403);
+    }
+
+    if ($bookLoan->status !== 'borrowed') {
+      return back()->with('error', 'Only borrowed books can be returned.');
+    }
+
+    $bookLoan->update([
+      'status' => 'returned',
+    ]);
+
+    $bookLoan->bookItem->update([
+      'status' => 'available',
+    ]);
+
+    return redirect()->back()->with('success', 'Book has been successfully returned.');
+  }
+
+  public function cancel(BookLoan $bookLoan)
+  {
+    if ($bookLoan->user_id !== Auth::id()) {
+      abort(403);
+    }
+
+    if ($bookLoan->status !== 'payment_pending' && $bookLoan->status !== 'admin_validation') {
+      return back()->with('error', 'You can only cancel loans that are still in payment pending status.');
+    }
+
+    $bookLoan->update(['status' => 'cancelled']);
+    $bookLoan->bookItem->update(['status' => 'available']);
+
+    return back()->with('success', 'Loan has been cancelled.');
+  }
+
+
 }
