@@ -1,21 +1,22 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+    <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
       {{ __('Edit Book Loan') }}
     </h2>
   </x-slot>
 
-  <div class="py-8">
+  <div class="py-10" style="background-color: #F9F3EF">
     <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-      <div class="bg-white shadow-md rounded-lg p-6">
-        <form method="POST" action="{{ route('admin.book-loans.update', $bookLoan) }}">
+      <div class="bg-white border border-[#d2c1b6] shadow-md rounded-xl p-8 space-y-6">
+
+        <form method="POST" action="{{ route('admin.book-loans.update', $bookLoan) }}" class="space-y-5">
           @csrf
           @method('PUT')
 
           {{-- User --}}
-          <div class="mb-4">
-            <label class="block font-medium text-sm text-gray-700">User</label>
-            <select name="user_id" class="form-select w-full mt-1 rounded-md shadow-sm border-gray-300" required>
+          <div class="space-y-2">
+            <label for="user_id" class="block text-sm font-medium text-[#1B3C53]">User</label>
+            <select name="user_id" id="user_id" class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]" required>
               @foreach ($users as $user)
                 <option value="{{ $user->id }}" {{ $bookLoan->user_id == $user->id ? 'selected' : '' }}>
                   {{ $user->name }}
@@ -26,9 +27,9 @@
           </div>
 
           {{-- Book Item --}}
-          <div class="mb-4">
-            <label class="block font-medium text-sm text-gray-700">Book</label>
-            <select name="book_item_id" class="form-select w-full mt-1 rounded-md shadow-sm border-gray-300" required>
+          <div class="space-y-2">
+            <label for="book_item_id" class="block text-sm font-medium text-[#1B3C53]">Book</label>
+            <select name="book_item_id" id="book_item_id" class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]" required>
               @foreach ($bookItems as $item)
                 <option value="{{ $item->id }}" {{ $bookLoan->book_item_id == $item->id ? 'selected' : '' }}>
                   {{ $item->book->title }}
@@ -39,33 +40,34 @@
           </div>
 
           {{-- Loan Date --}}
-          <div class="mb-4">
-            <label class="block font-medium text-sm text-gray-700">Loan Date</label>
-            <input type="date" name="loan_date" value="{{ $bookLoan->loan_date }}"
-              class="form-input w-full mt-1 rounded-md shadow-sm border-gray-300">
+          <div class="space-y-2">
+            <label for="loan_date" class="block text-sm font-medium text-[#1B3C53]">Loan Date</label>
+            <input type="date" name="loan_date" id="loan_date" value="{{ $bookLoan->loan_date }}"
+                   class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]">
             @error('loan_date') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
           </div>
 
           {{-- Due Date --}}
-          <div class="mb-4">
-            <label class="block font-medium text-sm text-gray-700">Due Date</label>
-            <input type="date" name="due_date" value="{{ $bookLoan->due_date }}"
-              class="form-input w-full mt-1 rounded-md shadow-sm border-gray-300">
+          <div class="space-y-2">
+            <label for="due_date" class="block text-sm font-medium text-[#1B3C53]">Due Date</label>
+            <input type="date" name="due_date" id="due_date" value="{{ $bookLoan->due_date }}"
+                   class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]">
             @error('due_date') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
           </div>
 
           {{-- Total Price --}}
-          <div class="mb-4">
-            <label class="block font-medium text-sm text-gray-700">Total Price (Rp)</label>
-            <input type="number" name="total_price" value="{{ $bookLoan->total_price }}"
-              class="form-input w-full mt-1 rounded-md shadow-sm border-gray-300" min="0" step="1000">
+          <div class="space-y-2">
+            <label for="total_price" class="block text-sm font-medium text-[#1B3C53]">Total Price (Rp)</label>
+            <input type="number" name="total_price" id="total_price" value="{{ $bookLoan->total_price }}"
+                   class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]"
+                   min="0" step="1000">
             @error('total_price') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
           </div>
 
           {{-- Status --}}
-          <div class="mb-4">
-            <label class="block font-medium text-sm text-gray-700">Status</label>
-            <select name="status" class="form-select w-full mt-1 rounded-md shadow-sm border-gray-300" required>
+          <div class="space-y-2">
+            <label for="status" class="block text-sm font-medium text-[#1B3C53]">Status</label>
+            <select name="status" id="status" class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]" required>
               @foreach ($statuses as $status)
                 <option value="{{ $status }}" {{ $bookLoan->status === $status ? 'selected' : '' }}>
                   {{ ucwords(str_replace('_', ' ', $status)) }}
@@ -76,17 +78,18 @@
           </div>
 
           {{-- Buttons --}}
-          <div class="flex justify-end space-x-2">
+          <div class="flex justify-end gap-3 pt-6 border-t border-[#d2c1b6]">
             <a href="{{ route('admin.book-loans.index') }}"
-              class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+               class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-sm transition">
               Cancel
             </a>
             <button type="submit"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                    class="px-4 py-2 bg-[#1B3C53] hover:bg-[#162f42] text-white rounded-md text-sm transition">
               Update Loan
             </button>
           </div>
         </form>
+
       </div>
     </div>
   </div>

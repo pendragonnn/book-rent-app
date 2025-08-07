@@ -1,31 +1,35 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
             {{ __('Add New Category') }}
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-md mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded shadow">
+    <div class="py-8 bg-[#F9F3EF] min-h-screen">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white p-8 rounded-2xl shadow-md border border-[#d2c1b6]">
                 <form method="POST" action="{{ route('admin.categories.store') }}">
                     @csrf
 
-                    <div class="mb-4">
-                        <label for="name" class="block font-medium text-sm">Category Name</label>
+                    <div class="mb-6">
+                        <label for="name" class="block text-sm font-semibold text-[#1B3C53] mb-1">
+                            Category Name
+                        </label>
                         <input type="text" name="name" id="name"
-                               class="w-full border rounded px-3 py-2 mt-1"
+                               class="w-full rounded-xl border border-[#d2c1b6] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1B3C53]"
                                value="{{ old('name') }}" required>
                         @error('name')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="flex justify-end space-x-2">
+                    <div class="flex justify-end gap-3 mt-6">
                         <a href="{{ route('admin.categories.index') }}"
-                           class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm">Cancel</a>
+                           class="px-5 py-2.5 g-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition">
+                            Cancel
+                        </a>
                         <button type="submit"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
+                                class="px-5 py-2.5 bg-[#1B3C53] hover:bg-[#162e40] text-white text-sm font-medium rounded-xl transition">
                             Save
                         </button>
                     </div>

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
             {{ __('Category List') }}
         </h2>
     </x-slot>
@@ -9,41 +9,43 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
             <a href="{{ route('admin.categories.create') }}"
-               class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
+               class="inline-block bg-[#1B3C53] hover:bg-[#162e3f] text-white px-4 py-2 rounded-md text-sm transition">
                 + Add New Category
             </a>
 
             @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded-md">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="bg-white p-4 rounded shadow">
-                <table id="categories-table" class="min-w-full divide-y divide-gray-200 text-sm">
-                    <thead class="bg-gray-100">
+            <div class="bg-white border border-[#d2c1b6] p-4 rounded-xl shadow-md">
+                <table id="categories-table" class="min-w-full text-sm">
+                    <thead class="bg-[#d2c1b6] text-white">
                         <tr>
                             <th class="px-4 py-2 text-left">Name</th>
                             <th class="px-4 py-2 text-left">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-[#e4dcd7]">
                         @forelse ($categories as $category)
-                            <tr>
+                            <tr class="hover:bg-[#f0e9e5]">
                                 <td class="px-4 py-2">{{ $category->name }}</td>
                                 <td class="px-4 py-2 space-x-2">
                                     <a href="{{ route('admin.categories.edit', $category) }}"
-                                       class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm">
+                                       class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm transition">
                                         Edit
                                     </a>
-                                   <button onclick="openDeleteModal({{ $category->id }})"
-                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                    <button onclick="openDeleteModal({{ $category->id }})"
+                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition">
                                         Delete
                                     </button>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="2" class="px-4 py-2 text-gray-500">No categories found.</td></tr>
+                            <tr>
+                                <td colspan="2" class="px-4 py-2 text-gray-500">No categories found.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -92,23 +94,24 @@
                 document.getElementById('deleteModal').classList.add('hidden');
             }
 
-            let table = $('#categories-table').DataTable({
-                responsive: true,
-                processing: true,
-                paging: true,
-                info: true,
-                language: {
-                    search: "Search:",
-                    lengthMenu: "Show _MENU_ entries",
-                    zeroRecords: "No matching books found",
-                    info: "Showing _START_ to _END_ of _TOTAL_ books",
-                    paginate: {
-                        previous: "Prev",
-                        next: "Next"
+            $(document).ready(function () {
+                $('#categories-table').DataTable({
+                    responsive: true,
+                    processing: true,
+                    paging: true,
+                    info: true,
+                    language: {
+                        search: "Search:",
+                        lengthMenu: "Show _MENU_ entries",
+                        zeroRecords: "No categories found",
+                        info: "Showing _START_ to _END_ of _TOTAL_ categories",
+                        paginate: {
+                            previous: "Prev",
+                            next: "Next"
+                        }
                     }
-                }
+                });
             });
-
         </script>
     @endpush
 </x-app-layout>
