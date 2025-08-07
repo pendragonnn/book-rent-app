@@ -14,17 +14,25 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
-            </div>
-
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
-            </div>
+    <body class="font-sans antialiased bg-primary-light flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8">
+    <div class="w-screen bg-white rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+        {{-- Left Section: Illustration/Branding --}}
+        <div class="md:w-1/2 bg-gradient-to-br from-secondary-light to-[#e0d0c5] p-8 flex flex-col items-center justify-center text-center text-[#1B3C53]">
+            <img src="https://placehold.co/150x150/1B3C53/FFFFFF?text=PB" alt="Pinjam Buku Logo" class="h-24 w-24 rounded-full mb-6 shadow-lg">
+            <h2 class="text-3xl font-bold mb-3">Selamat Datang Kembali!</h2>
+            <p class="text-lg text-gray-700">Masuk untuk melanjutkan petualangan membaca Anda.</p>
+            <p class="mt-6 text-sm">Belum punya akun?</p>
+            <a href="{{ route('register') }}" class="mt-2 px-6 py-2 rounded-full text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 shadow-md">
+                Daftar Sekarang
+            </a>
         </div>
-    </body>
+
+        {{-- Right Section: Login Form --}}
+        <div class="md:w-1/2 p-8 sm:p-10 lg:p-12 bg-[#faf4f0]">
+            <h2 class="text-2xl sm:text-3xl font-bold text-[#1B3C53] mb-8 text-center">Masuk ke Akun Anda</h2>
+            {{ $slot }}
+        </div>
+    </div>
+</body>
+@stack('scripts')
 </html>

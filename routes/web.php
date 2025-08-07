@@ -45,18 +45,24 @@ Route::middleware(['auth', CheckRole::class . ':member'])
     ->group(function () {
         Route::get('/dashboard', [memberDashboard::class, 'index'])->name('dashboard');
         Route::resource('books', memberBookController::class);
+        
         Route::resource('book-loans', memberBookLoanController::class);
         Route::get('/book-loans/create/{bookItem}', [memberBookLoanController::class, 'create'])->name('book-loans.create');
         Route::post('/book-loans/store', [memberBookLoanController::class, 'store'])->name('book-loans.store');
+        
         Route::post('/book-loans/{bookLoan}/upload-payment-proof', [memberBookLoanController::class, 'uploadPaymentProof'])
             ->name('book-loans.uploadPaymentProof');
+        
         Route::put('/book-loans/{bookLoan}/return', [memberBookLoanController::class, 'returnLoan'])
             ->name('book-loans.return');
         Route::put('/book-loans/{bookLoan}/cancel', [memberBookLoanController::class, 'cancel'])
             ->name('book-loans.cancel');
+        
+        // Loan Detail + edit
         Route::get('/book-loans/{bookLoan}', [memberBookLoanController::class, 'show'])->name('book-loans.show');
         Route::get('/book-loans/{bookLoan}/edit', [memberBookLoanController::class, 'edit'])->name('book-loans.edit');
         Route::put('/book-loans/{bookLoan}', [memberBookLoanController::class, 'update'])->name('book-loans.update');
+
     });
 
 
