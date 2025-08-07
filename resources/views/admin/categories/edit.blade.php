@@ -7,16 +7,18 @@
 
     <div class="py-8">
         <div class="max-w-md mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded shadow">
+            <div class="bg-white p-6 rounded shadow-md">
                 <form method="POST" action="{{ route('admin.categories.update', $category) }}">
                     @csrf
                     @method('PUT')
 
                     <div class="mb-4">
-                        <label for="name" class="block font-medium text-sm">Category Name</label>
+                        <label for="name" class="block text-sm font-medium text-gray-700">
+                            Category Name
+                        </label>
                         <input type="text" name="name" id="name"
-                               class="w-full border rounded px-3 py-2 mt-1"
-                               value="{{ old('name', $category->name) }}" required>
+                            class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                            value="{{ old('name', $category->name) }}" required>
                         @error('name')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -24,9 +26,11 @@
 
                     <div class="flex justify-end space-x-2">
                         <a href="{{ route('admin.categories.index') }}"
-                           class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm">Cancel</a>
+                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm transition">
+                            Cancel
+                        </a>
                         <button type="submit"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
+                            class="px-4 py-2 bg-[#1B3C53] hover:bg-[#162e40] text-white rounded text-sm transition">
                             Update
                         </button>
                     </div>

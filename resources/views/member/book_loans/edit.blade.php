@@ -1,39 +1,41 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="text-xl font-semibold text-gray-800 leading-tight">
+    <h2 class="text-xl font-semibold text-[#1B3C53] leading-tight">
       {{ __('Edit Loan') }}
     </h2>
   </x-slot>
 
-  <div class="py-8 max-w-3xl mx-auto sm:px-6 lg:px-8">
-    <div class="bg-white shadow-md rounded-lg p-6">
-      <form method="POST" action="{{ route('member.book-loans.update', $bookLoan) }}">
-        @csrf
-        @method('PUT')
+  <div class="py-10">
+    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+      <div class="bg-[#F9F3EF] shadow-lg rounded-2xl p-8 border border-[#d2c1b6]">
+        <form method="POST" action="{{ route('member.book-loans.update', $bookLoan) }}">
+          @csrf
+          @method('PUT')
 
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700">Loan Date</label>
-          <input type="date" name="loan_date" value="{{ old('loan_date', $bookLoan->loan_date) }}"
-            class="mt-1 block w-full rounded border-gray-300 shadow-sm">
-        </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-[#1B3C53] mb-1" for="loan_date">Loan Date</label>
+            <input type="date" name="loan_date" id="loan_date" value="{{ old('loan_date', $bookLoan->loan_date) }}"
+              class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm px-3 py-2 focus:ring-[#1B3C53] focus:border-[#1B3C53]">
+          </div>
 
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700">Due Date</label>
-          <input type="date" name="due_date" value="{{ old('due_date', $bookLoan->due_date) }}"
-            class="mt-1 block w-full rounded border-gray-300 shadow-sm">
-        </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-[#1B3C53] mb-1" for="due_date">Due Date</label>
+            <input type="date" id="due_date" name="due_date" value="{{ old('due_date', $bookLoan->due_date) }}"
+              class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm px-3 py-2 focus:ring-[#1B3C53] focus:border-[#1B3C53]">
+          </div>
 
-        <div class="flex justify-end space-x-2">
-          <a href="{{ route('member.book-loans.index') }}"
-             class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-            Cancel
-          </a>
-          <button type="submit"
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-            Update Loan
-          </button>
-        </div>
-      </form>
+          <div class="flex justify-end space-x-3">
+            <a href="{{ route('member.book-loans.index') }}"
+               class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2.5 rounded-lg transition-all duration-200">
+              Cancel
+            </a>
+            <button type="submit"
+                    class="bg-[#1B3C53] hover:bg-[#163040] text-white px-5 py-2.5 rounded-lg transition-all duration-200">
+              Update Loan
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</x-app-layout>
+ </x-app-layout>
