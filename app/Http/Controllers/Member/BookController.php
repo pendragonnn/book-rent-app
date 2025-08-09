@@ -24,7 +24,7 @@ class BookController extends Controller
       $query->where('category_id', $request->category);
     }
 
-    $books = $query->paginate(8);
+    $books = $query->paginate(9);
     $categories = Category::all();
 
     return view('member.books.index', compact('books', 'categories'));

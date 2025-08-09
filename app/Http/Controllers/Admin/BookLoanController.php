@@ -14,7 +14,7 @@ class BookLoanController extends Controller
     public function index()
     {
         $statuses = ['payment_pending', 'admin_validation', 'borrowed', 'returned', 'cancelled'];
-        $loans = BookLoan::with(['user', 'bookItem.book'])->latest()->get();
+        $loans = BookLoan::with(['user', 'bookItem.book'])->orderBy('created_at', 'desc')->orderBy('id', 'desc')->get();
         return view('admin.book_loans.index', compact('loans', 'statuses'));
     }
 
@@ -57,7 +57,7 @@ class BookLoanController extends Controller
 
         $bookItem->update(['status' => 'reserved']);
 
-        return redirect()->route('member.dashboard')->with('success', 'Peminjaman berhasil diajukan.');
+        return redirect()->route('admin.book-loans.index')->with('success', 'Peminjaman berhasil diajukan.');
     }
 
     public function show(BookLoan $bookLoan)
