@@ -58,7 +58,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2" class="px-4 py-2 text-gray-500">No categories found.</td>
+                                <td colspan="3" class="px-4 py-2 text-gray-500 text-center">No categories found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -97,6 +97,12 @@
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
         <script>
+
+            $.fn.dataTable.ext.errMode = function (settings, helpPage, message) {
+                console.warn("DataTables suppressed error:", message);
+            };
+
+            $.fn.dataTable.ext.errMode = 'none';
             function openDeleteModal(categoryId) {
                 const form = document.getElementById('deleteForm');
                 form.action = `/admin/categories/${categoryId}`;
@@ -137,6 +143,8 @@
                     cell.innerHTML = i + 1;
                 });
             }).draw();
+
+
         </script>
     @endpush
 </x-app-layout>

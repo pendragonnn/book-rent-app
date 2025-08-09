@@ -133,17 +133,7 @@
                     </div>
                 @empty
                     <div class="col-span-full text-center py-10 bg-white rounded-xl shadow-lg text-gray-600">
-                        <p class="text-lg font-medium mb-4">Tidak ada buku yang ditemukan sesuai kriteria Anda.</p>
-                        <a href="{{ route('member.books.index') }}"
-                            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm1.414 1.414a1 1 0 011.414 0L10 9.172l4.172-4.172a1 1 0 011.414 1.414L11.414 10l4.172 4.172a1 1 0 01-1.414 1.414L10 11.414l-4.172 4.172a1 1 0 01-1.414-1.414L8.586 10 4.414 5.828a1 1 0 010-1.414z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            Lihat Semua Buku
-                        </a>
+                        <p class="text-lg font-medium mb-4">Tidak ada buku yang ditemukan.</p>
                     </div>
                 @endforelse
             </div>
