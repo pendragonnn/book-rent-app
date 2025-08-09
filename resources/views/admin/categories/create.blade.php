@@ -25,11 +25,11 @@
 
                     <div class="flex justify-end gap-3 mt-6">
                         <a href="{{ route('admin.categories.index') }}"
-                           class="px-5 py-2.5 g-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition">
+                           class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded hover:bg-gray-600">
                             Cancel
                         </a>
                         <button type="submit"
-                                class="px-5 py-2.5 bg-[#1B3C53] hover:bg-[#162e40] text-white text-sm font-medium rounded-xl transition">
+                                class="inline-flex items-center px-4 py-2 bg-[#1B3C53] text-white text-sm font-medium rounded hover:bg-[#162e3f]">
                             Save
                         </button>
                     </div>

@@ -7,10 +7,21 @@
 
   <div class="py-10">
     <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-      <div class="bg-[#F9F3EF] shadow-lg rounded-2xl p-8 border border-[#d2c1b6]">
+      @if($errors->any())
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+          <ul>
+            @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+      <div class="bg-white shadow-lg rounded-2xl p-8 border border-[#d2c1b6]">
         <form method="POST" action="{{ route('member.book-loans.update', $bookLoan) }}">
           @csrf
           @method('PUT')
+
+          <h1>Targed Loan ID: {{ $bookLoan->id }}</h1>
 
           <div class="mb-6">
             <label class="block text-sm font-medium text-[#1B3C53] mb-1" for="loan_date">Loan Date</label>

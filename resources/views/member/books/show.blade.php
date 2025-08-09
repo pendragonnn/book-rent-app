@@ -6,49 +6,66 @@
   </x-slot>
 
   <div class="py-8 bg-[#F9F3EF] min-h-screen">
-    <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-      <div class="bg-white border border-[#D2C1B6] rounded-xl shadow p-6 flex flex-col md:flex-row gap-6">
-        {{-- Book Cover --}}
-        <div class="flex-shrink-0 flex justify-center md:justify-start">
-          <img src="{{ asset('covers/' . $book->cover_image) }}" alt="{{ $book->title }}"
-            class="w-48 h-auto rounded-md shadow-md">
-        </div>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-[#D2C1B6]">
+        <div class="flex flex-col items-center md:flex-row gap-8 p-6">
+          {{-- Cover --}}
+          <div class="flex-shrink-0">
+            @php
+                $coverPath = public_path('covers/' . $book->cover_image);
+            @endphp
 
-        {{-- Book Info --}}
-        <div class="flex-1 space-y-3 text-[#4B4B4B]">
-          <h3 class="text-2xl font-bold text-[#1B3C53]">{{ $book->title }}</h3>
-          <p class="text-sm"><span class="font-medium">Author:</span> {{ $book->author }}</p>
-          <p class="text-sm"><span class="font-medium">Category:</span> {{ $book->category->name ?? '-' }}</p>
-          <p class="text-sm"><span class="font-medium">Publisher:</span> {{ $book->publisher ?? '-' }}</p>
-          <p class="text-sm"><span class="font-medium">Published Year:</span> {{ $book->year ?? '-' }}</p>
-          <p class="text-sm"><span class="font-medium">ISBN:</span> {{ $book->isbn ?? '-' }}</p>
-          <p class="text-sm"><span class="font-medium">Rental Price:</span> Rp {{ number_format($book->rental_price, 0, ',', '.') }}</p>
-          <p class="text-sm"><span class="font-medium">Available Stock:</span> {{ $book->availableItemsCount() }}</p>
-
-          {{-- Description --}}
-          @if ($book->description)
-            <div class="pt-2">
-              <h4 class="text-sm font-medium text-[#1B3C53] mb-1">Description:</h4>
-              <p class="text-sm leading-relaxed">{{ $book->description }}</p>
-            </div>
-          @endif
-
-          {{-- Buttons --}}
-          <div class="mt-6 flex flex-col sm:flex-row gap-3">
-            <a href="{{ route('member.books.index') }}"
-              class="inline-block bg-[#D2C1B6] hover:bg-[#bba797] text-white text-sm px-4 py-2 rounded-md text-center">
-              ← Back to Catalog
-            </a>
-
-            @if ($book->items->where('status', 'available')->count() > 0)
-              @php $item = $book->items->where('status', 'available')->first(); @endphp
-              <a href="{{ route('member.book-loans.create', $item->id) }}"
-                class="inline-block bg-[#1B3C53] hover:bg-[#162f44] text-white text-sm px-4 py-2 rounded-md text-center">
-                📚 Pinjam Buku Ini
-              </a>
+            @if ($book->cover_image && file_exists($coverPath))
+              <img src="{{ asset('covers/' . $book->cover_image) }}"
+                   alt="Cover Image"
+                   class="w-40 h-56 object-cover rounded-xl shadow-md">
             @else
-              <span class="text-gray-500 text-sm mt-2 sm:mt-0">Buku tidak tersedia untuk dipinjam</span>
+              <div class="w-40 h-56 bg-gray-200 flex items-center justify-center text-gray-500 rounded-xl text-center px-2 text-sm shadow-inner">
+                No Cover Image Available
+              </div>
             @endif
+          </div>
+
+          {{-- Book Info --}}
+          <div class="flex-1 space-y-4">
+            <div>
+              <h3 class="text-3xl font-bold text-[#1B3C53]">{{ $book->title }}</h3>
+              <p class="text-sm text-[#555] italic">by {{ $book->author }}</p>
+            </div>
+
+            <div class="text-sm text-gray-800 space-y-1">
+              <p><strong>📚 Publisher:</strong> {{ $book->publisher ?? '-' }}</p>
+              <p><strong>🗓 Year:</strong> {{ $book->year ?? '-' }}</p>
+              <p><strong>🔖 ISBN:</strong> {{ $book->isbn ?? '-' }}</p>
+              <p><strong>📂 Category:</strong> {{ $book->category->name ?? '-' }}</p>
+              <p><strong>💰 Rental Price:</strong> Rp{{ number_format($book->rental_price, 0, ',', '.') }}</p>
+              <p><strong>📦 Available Stock:</strong> {{ $book->items->where('status', 'available')->count() }}</p>
+              <p><strong>📊 Total Stock:</strong> {{ $book->items->count() }}</p>
+            </div>
+
+            <div>
+              <p class="font-semibold text-[#1B3C53]">📝 Description:</p>
+              <p class="text-justify text-sm text-gray-700">
+                {{ $book->description ?? 'No description available.' }}
+              </p>
+            </div>
+
+            <div class="pt-4 flex items-center gap-5">
+              <a href="{{ route('member.books.index') }}"
+                 class="inline-block bg-[#1B3C53] hover:bg-[#153042] text-white px-5 py-2 rounded-md text-sm transition-all duration-200">
+                ← Back to List
+              </a>
+              @if ($book->items->where('status', 'available')->count() > 0)
+                @php $item = $book->items->where('status', 'available')->first(); @endphp
+                <a href="{{ route('member.book-loans.create', $item->id) }}"
+                  class="inline-block bg-[#1B3C53] hover:bg-[#162f44] text-white text-sm px-4 py-2 rounded-md text-center">
+                  📚 Pinjam Buku Ini
+                </a>
+              @else
+                <span class="text-gray-500 text-sm mt-2 sm:mt-0">Buku tidak tersedia untuk dipinjam</span>
+              @endif
+            </div>
+
           </div>
         </div>
       </div>

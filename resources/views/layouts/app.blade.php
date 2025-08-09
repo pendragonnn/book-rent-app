@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Pinjam Buku') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -31,7 +31,7 @@
             <div class="flex-1 flex flex-col overflow-hidden">
                 {{-- Top Bar for Mobile (with Hamburger Icon) --}}
                 {{-- This header is only visible on small screens (md:hidden) --}}
-                <header class="bg-white shadow-sm py-4 px-6 md:hidden flex items-center justify-between z-20">
+                <header class="bg-white shadow-sm py-3 px-6 md:hidden flex items-center justify-between z-20">
                     <button id="sidebarToggle" class="text-[#1B3C53] focus:outline-none p-2 rounded-md hover:bg-gray-100 transition-colors duration-200">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -42,7 +42,7 @@
 
                 {{-- Page Header (for desktop, or when sidebar is closed on mobile) --}}
                 @isset($header)
-                    <header class="bg-white shadow-sm py-4 px-6 lg:px-8">
+                    <header class="bg-white shadow-sm py-5 px-4 md:px-6">
                         <div class="max-w-7xl mx-auto">
                             {{ $header }}
                         </div>
@@ -50,7 +50,7 @@
                 @endisset
 
                 {{-- Page Content --}}
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F9F3EF] p-4 md:p-8">
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F9F3EF] md:p-0 p-4">
                     {{ $slot }}
                 </main>
             </div>

@@ -86,7 +86,7 @@
           {{-- Buttons --}}
           <div class="flex justify-end gap-3 pt-6 border-t border-[#d2c1b6]">
             <a href="{{ route('admin.book-loans.index') }}"
-               class="px-4 py-2 bg-[#d2c1b6] hover:bg-[#c7b4a8] text-white rounded-md text-sm transition">
+               class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-sm transition">
               Cancel
             </a>
             <button type="submit"
