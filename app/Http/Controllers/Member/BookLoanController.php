@@ -98,7 +98,7 @@ class BookLoanController extends Controller
     }
 
     $validated = $request->validate([
-      'loan_date' => 'required|date|after_or_equal:today',
+      'loan_date' => 'required|date',
       'due_date' => 'required|date|after_or_equal:loan_date',
     ]);
 
