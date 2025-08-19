@@ -39,7 +39,7 @@
     <body class="font-sans antialiased bg-primary-light text-dark-blue">
         <div class="min-h-screen flex flex-col">
             {{-- Navigation Header --}}
-            <header class="w-full bg-white shadow-sm py-4 px-6 sm:px-8 lg:px-12 flex items-center justify-between z-10">
+            <header class="w-full sticky md:fixed right-0 top-0 bg-white shadow-sm py-4 px-6 sm:px-8 lg:px-12 flex items-center justify-between z-10">
                 <div class="flex items-center">
                     <img src="https://placehold.co/40x40/1B3C53/FFFFFF?text=PB" alt="Pinjam Buku Logo" class="h-10 w-10 rounded-full mr-3">
                     <a href="{{ url('/') }}" class="text-2xl font-bold text-dark-blue">Pinjam Buku</a>
@@ -67,9 +67,9 @@
             </header>
 
             {{-- Hero Section --}}
-            <section class="flex-1 flex flex-col md:flex-row items-center justify-center p-6 sm:p-10 lg:p-16 bg-gradient-to-br from-primary-light to-secondary-light text-center md:text-left">
+            <section class="h-dvh flex flex-col md:flex-row items-center justify-center p-6 sm:p-10 lg:p-16 bg-gradient-to-br from-primary-light to-secondary-light text-center md:text-left">
                 <div class="md:w-1/2 lg:w-2/3 md:pr-8 mb-8 md:mb-0">
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 text-dark-blue animate-fade-in-down">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-10 text-dark-blue animate-fade-in-down">
                         Temukan Dunia Pengetahuan di <span class="text-blue-600">Pinjam Buku</span>
                     </h1>
                     <p class="text-lg sm:text-xl lg:text-2xl text-gray-700 mb-8 animate-fade-in delay-200">
@@ -86,7 +86,7 @@
                 </div>
                 <div class="md:w-1/2 lg:w-1/3 flex justify-center items-center animate-fade-in delay-600">
                     {{-- Placeholder for a book illustration or simple graphic --}}
-                    <img src="https://placehold.co/400x300/1B3C53/FFFFFF?text=Baca+Buku" alt="Book Illustration" class="w-full max-w-sm rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-500">
+                    <img src="/landing.png" alt="Book Illustration" class="w-full max-w-sm rounded-lg transform hover:scale-105 transition-transform duration-500">
                 </div>
             </section>
 
