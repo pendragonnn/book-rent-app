@@ -15,6 +15,6 @@ class BookLoanReceiptItem extends Model
 
     public function loan()
     {
-        return $this->belongsTo(BookLoan::class, 'loan_id');
+        return $this->belongsTo(BookLoan::class, 'book_loan_id');
     }
 }

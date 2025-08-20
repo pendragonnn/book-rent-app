@@ -17,4 +17,10 @@ class BookLoanReceipt extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function loans()
+    {
+        return $this->belongsToMany(BookLoan::class, 'book_loan_receipt_items', 'receipt_id', 'book_loan_id')
+                    ->withTimestamps();
+    }
 }

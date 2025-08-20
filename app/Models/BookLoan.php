@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class BookLoan extends Model
 {
     protected $fillable = [
-        'user_id', 'book_item_id', 'loan_date', 'due_date', 'status', 'loan_price'
+        'user_id',
+        'book_item_id',
+        'loan_date',
+        'due_date',
+        'status',
+        'loan_price'
     ];
 
     public function user()
@@ -23,6 +28,12 @@ class BookLoan extends Model
     public function return()
     {
         return $this->hasOne(BookReturn::class, 'loan_id');
+    }
+
+    public function receipts()
+    {
+        return $this->belongsToMany(BookLoanReceipt::class, 'book_loan_receipt_items', 'book_loan_id', 'receipt_id')
+            ->withTimestamps();
     }
 }
 
