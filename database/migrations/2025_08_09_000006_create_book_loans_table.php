@@ -14,8 +14,7 @@ return new class extends Migration {
             $table->date('due_date');
             $table->enum('status', ['payment_pending', 'admin_validation', 'cancelled', 'borrowed', 'returned'])
                   ->default('payment_pending');
-            $table->decimal('total_price', 10, 2)->nullable();
-            $table->string('payment_proof')->nullable();
+            $table->decimal('loan_price', 10, 2)->nullable();
             $table->timestamps();
         });
     }
