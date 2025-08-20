@@ -13,48 +13,46 @@ class BookLoanReceiptController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'book_loan_ids' => 'required|array',
-            'book_loan_ids.*' => 'exists:book_loans,id',
+            'payment_method' => 'required|string|in:bank_transer,ewallet,cash', 
             'payment_proof' => 'required|image|max:2048',
         ]);
+
+        $cart = session()->get('cart', []);
+        if (empty($cart)) {
+            return redirect()->route('member.cart.index')
+                ->with('error', 'Cart masih kosong.');
+        }
 
         $file = $request->file('payment_proof');
         $path = $file->store('payment_proofs', 'public');
 
+        // Hitung total harga
+        $totalPrice = collect($cart)->sum(function ($item) {
+            return $item['price'] * $item['quantity'];
+        });
+
+        // Insert ke receipts
         $receipt = BookLoanReceipt::create([
             'user_id' => Auth::id(),
+            'payment_method' => $request->payment_method,
+            'total_price' => $totalPrice,
             'payment_proof' => $path,
-            'status' => 'pending',
+            'status' => 'admin_validation',
         ]);
 
-        foreach ($request->book_loan_ids as $loanId) {
+        // Insert item per cart
+        foreach ($cart as $item) {
             BookLoanReceiptItem::create([
                 'receipt_id' => $receipt->id,
-                'book_loan_id' => $loanId,
+                'book_loan_id' => $item['book_loan_id'],
             ]);
         }
 
-        return redirect()->route('receipts.show', $receipt->id)
-            ->with('success', 'Bukti pembayaran berhasil diupload.');
+        // Kosongkan cart
+        session()->forget('cart');
+
+        return redirect()->route('member.book-loan.index', $receipt->id)
+            ->with('success', 'Checkout berhasil! Menunggu validasi admin.');
     }
 
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:approved,rejected',
-        ]);
-
-        $receipt = BookLoanReceipt::findOrFail($id);
-        $receipt->update([
-            'status' => $request->status,
-        ]);
-
-        if ($request->status === 'approved') {
-            foreach ($receipt->items as $item) {
-                $item->bookLoan->update(['status' => 'active']);
-            }
-        }
-
-        return back()->with('success', 'Status pembayaran diperbarui.');
-    }
 }

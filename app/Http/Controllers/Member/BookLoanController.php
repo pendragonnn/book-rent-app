@@ -66,7 +66,7 @@ class BookLoanController extends Controller
       'loan_date' => $validated['loan_date'],
       'due_date' => $validated['due_date'],
       'status' => 'payment_pending',
-      'total_price' => $totalPrice,
+      'loan_price' => $totalPrice,
     ]);
 
     $bookItem->update(['status' => 'reserved']);
@@ -111,7 +111,7 @@ class BookLoanController extends Controller
     $bookLoan->update([
       'loan_date' => $validated['loan_date'],
       'due_date' => $validated['due_date'],
-      'total_price' => $totalPrice,
+      'loan_price' => $totalPrice,
     ]);
 
     return redirect()->route('member.book-loans.index')->with('success', 'Loan details updated.');

@@ -69,7 +69,7 @@
               <td class="px-4 py-2">{{ $loan->bookItem->book->created_at }}</td>
               <td class="px-4 py-2">{{ $loan->loan_date }}</td>
               <td class="px-4 py-2">{{ $loan->due_date }}</td>
-              <td class="px-4 py-2">Rp{{ number_format($loan->total_price, 0, ',', '.') }}</td>
+              <td class="px-4 py-2">Rp{{ number_format($loan->loan_price, 0, ',', '.') }}</td>
               <td class="px-4 py-2">
               @if ($loan->payment_proof)
             <span class="text-green-600 font-medium text-sm">Paid</span>

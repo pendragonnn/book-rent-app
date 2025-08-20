@@ -52,7 +52,7 @@ class BookLoanController extends Controller
             'loan_date' => $validated['loan_date'],
             'due_date' => $validated['due_date'],
             'status' => 'payment_pending',
-            'total_price' => $totalPrice,
+            'loan_price' => $totalPrice,
         ]);
 
         $bookItem->update(['status' => 'reserved']);
@@ -97,7 +97,7 @@ class BookLoanController extends Controller
             'loan_date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:loan_date',
             'status' => 'required|in:payment_pending,admin_validation,borrowed,returned,cancelled',
-            'total_price' => 'required|numeric|min:0'
+            'loan_price' => 'required|numeric|min:0'
         ]);
 
         $bookLoan->update($validated);

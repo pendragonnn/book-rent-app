@@ -4,15 +4,10 @@
             <h2 class="font-bold text-xl text-[#1B3C53] leading-tight">
                 {{ __('Katalog Buku') }}
             </h2>
-            {{-- Optional: Add a button to go back to dashboard or another relevant page --}}
-            <a href="{{ route('dashboard') }}"
-                class="inline-flex items-center px-4 text-sm font-medium underline text-gray-500 hover:text-[#1B3C53] transition duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="size-5 mr-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                </svg>
-
-                Kembali ke Dashboard
+            <a href="{{ route('member.cart.index') }}"
+                class="bg-[#1B3C53] hover:border-[#1B3C53] px-4 py-2 rounded-md text-md font-medium text-gray-500 hover:text-white  transition duration-300">
+                🛒
+                My Cart ({{ count(session('cart', [])) }})
             </a>
         </div>
     </x-slot>
@@ -120,8 +115,10 @@
                                     <a href="{{ route('member.book-loans.create', $availableItem->id) }}"
                                         class="flex flex-1 justify-center gap-x-2 text-center text-base bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors duration-300 shadow-md">
                                         Pinjam
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                                         </svg>
                                     </a>
                                 @else

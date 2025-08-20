@@ -93,7 +93,7 @@
                                         {{ \Carbon\Carbon::parse($loan->due_date)->format('d M Y') }}
                                     </td>
                                     <td class="px-4 py-3 text-gray-700">
-                                        Rp{{ number_format($loan->total_price, 0, ',', '.') }}</td>
+                                        Rp{{ number_format($loan->loan_price, 0, ',', '.') }}</td>
                                     <td class="px-4 py-2">
                                         <span
                                             class="text-center flex items-center justify-center text-white px-2 py-1 rounded-full text-xs font-semibold shadow-sm {{ $statusColor }}">
