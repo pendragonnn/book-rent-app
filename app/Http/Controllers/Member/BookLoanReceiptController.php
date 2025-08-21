@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Member;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\BookLoanReceipt;
 use App\Models\BookLoanReceiptItem;
 use App\Models\BookLoan;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\BookItem;
 
 class BookLoanReceiptController extends Controller
 {
     public function store(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|string|in:bank_transer,ewallet,cash', 
-            'payment_proof' => 'required|image|max:2048',
+            'payment_method' => 'required|string|in:bank_transfer,ewallet,cash',
         ]);
 
         $cart = session()->get('cart', []);
@@ -26,33 +27,42 @@ class BookLoanReceiptController extends Controller
         $file = $request->file('payment_proof');
         $path = $file->store('payment_proofs', 'public');
 
-        // Hitung total harga
         $totalPrice = collect($cart)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
+            return $item['total_price'];
         });
 
-        // Insert ke receipts
         $receipt = BookLoanReceipt::create([
             'user_id' => Auth::id(),
             'payment_method' => $request->payment_method,
             'total_price' => $totalPrice,
             'payment_proof' => $path,
-            'status' => 'admin_validation',
+            'status' => 'pending',
         ]);
 
-        // Insert item per cart
         foreach ($cart as $item) {
+
+            $bookLoan = BookLoan::create([
+                'user_id' => Auth::id(),
+                'book_item_id' => $item['book_item_id'],
+                'loan_date' => $item['loan_date'],
+                'due_date' => $item['due_date'],
+                'status' => 'payment_pending',
+                'loan_price' => $item['total_price'],
+            ]);
+
+            $bookItem = BookItem::findOrFail($item['book_item_id']);
+
+            $bookItem->update(['status' => 'reserved']);
+
             BookLoanReceiptItem::create([
                 'receipt_id' => $receipt->id,
-                'book_loan_id' => $item['book_loan_id'],
+                'loan_id' => $bookLoan->id,
             ]);
         }
 
-        // Kosongkan cart
         session()->forget('cart');
 
-        return redirect()->route('member.book-loan.index', $receipt->id)
+        return redirect()->route('member.book-loans.index')
             ->with('success', 'Checkout berhasil! Menunggu validasi admin.');
     }
-
 }

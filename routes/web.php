@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\DashboardController as adminDashboard;
 use App\Http\Controllers\Member\DashboardController as memberDashboard;
 use App\Http\Controllers\Member\CartController;
+use App\Http\Controllers\Member\BookLoanReceiptController as memberBookLoanReceiptController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -68,6 +69,8 @@ Route::middleware(['auth', CheckRole::class . ':member'])
         Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
         Route::delete('/cart/remove/{index}', [CartController::class, 'remove'])->name('cart.remove');
 
+        // Receipts (checkout)
+        Route::post('/receipts', [memberBookLoanReceiptController::class, 'store'])->name('receipts.store');
     });
 
 
