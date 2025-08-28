@@ -57,11 +57,11 @@
           {{-- Buttons --}}
           <div class="flex justify-end gap-3 mt-8">
             <a href="{{ route('admin.users.index') }}"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded hover:bg-gray-600 transition">
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-full hover:bg-gray-600 transition">
               Cancel
             </a>
             <button type="submit"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[#1B3C53] rounded hover:bg-[#162f42] transition">
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[#1B3C53] rounded-full hover:bg-[#162f42] transition">
               Save User
             </button>
           </div>

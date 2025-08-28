@@ -1,4 +1,7 @@
 <x-app-layout>
+    <x-slot:title>
+        {{ __('Book Categories') }} - {{ config('app.name') }}
+    </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
             {{ __('Category List') }}
@@ -16,9 +19,11 @@
             </div>
 
             @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-4 rounded-md">
-                    {{ session('success') }}
-                </div>
+                <div class="mb-4 p-3 rounded bg-green-100 text-green-700"> {{ session('success') }} </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-4 p-3 rounded bg-red-100 text-red-700"> {{ session('error') }} </div>
             @endif
 
             <div class="bg-white border border-[#d2c1b6] p-4 md:rounded-lg shadow-md mt-4">
@@ -45,8 +50,11 @@
                                         </svg>
                                         Edit
                                     </a>
-                                    <button onclick="openDeleteModal({{ $category->id }})"
-                                        class="bg-red-600 hover:bg-red-700 text-white rounded-md px-3 py-1 text-xs transition-colors duration-300 flex items-center">
+                                    <!-- Tombol Delete -->
+                                    <button type="button"
+                                        class="bg-red-600 hover:bg-red-700 text-white rounded-md px-3 py-1 text-xs transition-colors duration-300 flex items-center delete-btn"
+                                        data-category-id="{{ $category->id }}" data-category-name="{{ $category->name }}"
+                                        data-delete-url="{{ route('admin.categories.destroy', $category->id) }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="2" stroke="currentColor" class="size-4 mr-1">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -67,22 +75,36 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-xl font-semibold mb-4 text-red-600">Are you sure?</h2>
-            <p class="mb-4 text-gray-700">This action will permanently delete the category.</p>
+    <div id="deleteModal" tabindex="-1"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Hapus Kategori</h2>
+            <p class="text-sm text-gray-600 mb-3">
+                Anda akan menghapus kategori: <span id="categoryName" class="font-semibold"></span>
+            </p>
+            <p class="text-sm text-gray-600 mb-3">
+                Untuk melanjutkan, ketik kalimat berikut:
+                <span class="font-semibold block mt-1">
+                    saya mengetahui bahwa penghapusan ini akan mempengaruhi data lain dan saya sudah memeriksanya
+                </span>
+            </p>
 
             <form id="deleteForm" method="POST">
                 @csrf
                 @method('DELETE')
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="closeDeleteModal()"
-                        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                        Cancel
+
+                <input type="text" name="delete_confirmation" id="deleteConfirmation" required
+                    placeholder="Ketik konfirmasi di sini..."
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53] mb-4">
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" id="cancelDelete"
+                        class="px-4 py-2 rounded-md border text-gray-700 hover:bg-gray-100">
+                        Batal
                     </button>
-                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-                        Delete
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        Hapus
                     </button>
                 </div>
             </form>
@@ -97,6 +119,51 @@
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
         <script>
+            // Modal functionality
+            const deleteModal = document.getElementById('deleteModal');
+            const deleteForm = document.getElementById('deleteForm');
+            const categoryNameSpan = document.getElementById('categoryName');
+            const deleteConfirmation = document.getElementById('deleteConfirmation');
+            const cancelDelete = document.getElementById('cancelDelete');
+
+            // Event listener untuk tombol delete
+            document.addEventListener('click', function (e) {
+                if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+                    const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
+                    const userId = btn.dataset.userId;
+                    const categoryName = btn.dataset.categoryName;
+                    const deleteUrl = btn.dataset.deleteUrl;
+
+                    // Set form action dan user name
+                    deleteForm.action = deleteUrl;
+                    categoryNameSpan.textContent = categoryName;
+
+                    // Reset form
+                    deleteConfirmation.value = '';
+
+                    // Show modal
+                    deleteModal.classList.remove('hidden');
+                }
+            });
+
+            // Close modal ketika cancel
+            cancelDelete.addEventListener('click', function () {
+                deleteModal.classList.add('hidden');
+            });
+
+            // Close modal ketika klik overlay
+            deleteModal.addEventListener('click', function (e) {
+                if (e.target === deleteModal) {
+                    deleteModal.classList.add('hidden');
+                }
+            });
+
+            // Close modal dengan ESC key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+                    deleteModal.classList.add('hidden');
+                }
+            });
 
             $.fn.dataTable.ext.errMode = function (settings, helpPage, message) {
                 console.warn("DataTables suppressed error:", message);

@@ -1,4 +1,8 @@
 <x-app-layout>
+  {{-- Define the title for the browser tab --}}
+    <x-slot:title>
+        {{ __('Detail Book - '.$book->title) }} 
+    </x-slot>
   <x-slot name="header">
     <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
       {{ __('Book Detail') }}
@@ -50,19 +54,19 @@
               </p>
             </div>
 
-            <div class="pt-4 flex items-center gap-5">
+            <div class="pt-4 flex flex-col md:flex-row items-center gap-5">
               <a href="{{ route('member.books.index') }}"
-                 class="inline-block bg-[#1B3C53] hover:bg-[#153042] text-white px-5 py-2 rounded-md text-sm transition-all duration-200">
+                 class="inline-block bg-[#1B3C53] hover:bg-[#153042] text-white px-5 py-2 rounded-full text-sm transition-all duration-200">
                 ← Back to List
               </a>
               @if ($book->items->where('status', 'available')->count() > 0)
                 @php $item = $book->items->where('status', 'available')->first(); @endphp
                 <a href="{{ route('member.book-loans.create', $item->id) }}"
-                  class="inline-block bg-[#1B3C53] hover:bg-[#162f44] text-white text-sm px-4 py-2 rounded-md text-center">
-                  📚 Pinjam Buku Ini
+                  class="inline-block bg-[#1B3C53] hover:bg-[#162f44] text-white text-sm px-4 py-2 rounded-full text-center">
+                  Borrow this book
                 </a>
               @else
-                <span class="text-gray-500 text-sm mt-2 sm:mt-0">Buku tidak tersedia untuk dipinjam</span>
+                <span class="text-gray-500 text-sm mt-2 sm:mt-0">The book is not available for borrowing</span>
               @endif
             </div>
 

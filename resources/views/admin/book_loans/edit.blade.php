@@ -1,4 +1,7 @@
 <x-app-layout>
+  <x-slot:title>
+        {{ __('Edit Loan') }} - {{ config('app.name') }}
+    </x-slot>
   <x-slot name="header">
     <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
       {{ __('Edit Book Loan') }}
@@ -13,7 +16,7 @@
           @csrf
           @method('PUT')
 
-          {{-- User --}}
+          {{-- User
           <div class="space-y-2">
             <label for="user_id" class="block text-sm font-medium text-[#1B3C53]">User</label>
             <select name="user_id" id="user_id" class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]" required>
@@ -24,10 +27,10 @@
               @endforeach
             </select>
             @error('user_id') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
-          </div>
+          </div> --}}
 
           {{-- Book Item --}}
-          <div class="space-y-2">
+          <div class="space-y-2 hidden">
             <label for="book_item_id" class="block text-sm font-medium text-[#1B3C53]">Book</label>
             <select name="book_item_id" id="book_item_id" class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]" required>
               @foreach ($bookItems as $item)
@@ -55,13 +58,14 @@
             @error('due_date') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
           </div>
 
-          {{-- Total Price --}}
-          <div class="space-y-2">
-            <label for="total_price" class="block text-sm font-medium text-[#1B3C53]">Total Price (Rp)</label>
-            <input type="number" name="total_price" id="total_price" value="{{ $bookLoan->total_price }}"
-                   class="mt-1 block w-full rounded-md border-[#d2c1b6] shadow-sm focus:ring-[#1B3C53] focus:border-[#1B3C53]"
-                   min="0" step="1000">
-            @error('total_price') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+          <p class="mt-1 text-sm text-gray-500">
+            Harga per hari: Rp {{ number_format($bookLoan->bookItem->book->rental_price, 2) }}
+          </p>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-[#1B3C53] mb-1" for="loan_price">Total Price</label>
+            <input type="text" name="loan_price" id="loan_price" readonly value="Rp. {{ old('loan_price', $bookLoan->loan_price)}}"
+              class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm px-3 py-2 bg-gray-100">
           </div>
 
           {{-- Status --}}
@@ -79,12 +83,12 @@
 
           {{-- Buttons --}}
           <div class="flex justify-end gap-3 pt-6 border-t border-[#d2c1b6]">
-            <a href="{{ route('admin.book-loans.index') }}"
-               class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-sm transition">
+            <a href="javascript:history.back()"
+               class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-full text-sm transition">
               Cancel
             </a>
             <button type="submit"
-                    class="px-4 py-2 bg-[#1B3C53] hover:bg-[#162f42] text-white rounded-md text-sm transition">
+                    class="px-4 py-2 bg-[#1B3C53] hover:bg-[#162f42] text-white rounded-full text-sm transition">
               Update Loan
             </button>
           </div>
@@ -93,4 +97,38 @@
       </div>
     </div>
   </div>
+
+  @push('scripts')
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const loanDateInput = document.getElementById('loan_date');
+        const dueDateInput = document.getElementById('due_date');
+        const totalPriceInput = document.getElementById('loan_price');
+
+        const pricePerDay = {{ $bookLoan->bookItem->book->rental_price }};
+
+        function calculateTotal() {
+          const loanDate = new Date(loanDateInput.value);
+          const dueDate = new Date(dueDateInput.value);
+          
+          // Validasi tanggal
+          if (!loanDateInput.value || !dueDateInput.value) return;
+          if (loanDate > dueDate) return;
+
+          const diffTime = dueDate - loanDate;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          const totalPrice = diffDays * pricePerDay;
+          
+          
+          totalPriceInput.value = totalPrice
+        }
+
+        loanDateInput.addEventListener('change', calculateTotal);
+        dueDateInput.addEventListener('change', calculateTotal);
+        
+        calculateTotal();
+      });
+    </script>
+  @endpush
 </x-app-layout>

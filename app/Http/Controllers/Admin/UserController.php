@@ -11,8 +11,9 @@ class UserController extends Controller
 {
     public function index()
     {
+        $roles = Role::all();
         $users = User::latest()->get();
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'roles'));
     }
 
     public function create()
@@ -48,7 +49,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:6', 
+            'password' => 'nullable|string|min:6',
             'role_id' => 'required|in:1,2',
         ]);
 
@@ -63,10 +64,33 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user, Request $request)
     {
+        // Validasi konfirmasi
+        $confirmationText = "saya mengetahui bahwa penghapusan ini akan mempengaruhi data lain dan saya sudah memeriksanya";
+        if ($request->input('delete_confirmation') !== $confirmationText) {
+            return redirect()->back()
+                ->with('error', 'Konfirmasi penghapusan salah. Harap ketik kalimat dengan benar.');
+        }
+        // Ambil semua loans lewat receipts
+        foreach ($user->receipts as $receipt) {
+            $receipt->update(['status' => 'cancelled']);
+            foreach ($receipt->loans as $loan) {
+                // dd($loan->status);
+                // Kalau status masih borrowed, balikin jadi available
+                if ($loan->bookItem) {
+                    $loan->bookItem->update(['status' => 'available']);
+                }
+                // Bebas, mau delete loan atau biarin
+                $loan->update(['status'=> 'cancelled']);
+            }
+        }
+
+        // Hapus user (user_id di receipts otomatis jadi NULL karena set null)
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully!');
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User deleted successfully!');
     }
+
 }

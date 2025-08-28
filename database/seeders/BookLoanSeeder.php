@@ -37,7 +37,7 @@ class BookLoanSeeder extends Seeder
                 [
                     'due_date' => $dueDate->toDateString(),
                     'status' => $status,
-                    'total_price' => $price,
+                    'loan_price' => $price,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]

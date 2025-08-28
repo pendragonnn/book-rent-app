@@ -1,4 +1,8 @@
 <x-app-layout>
+  {{-- Define the title for the browser tab --}}
+    <x-slot:title>
+        {{ __('Edit Loan') }} - {{ config('app.name') }}
+    </x-slot>
   <x-slot name="header">
     <h2 class="text-xl font-semibold text-[#1B3C53] leading-tight">
       {{ __('Edit Loan') }}
@@ -32,24 +36,30 @@
             <input type="date" id="due_date" name="due_date" value="{{ old('due_date', $bookLoan->due_date) }}"
               class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm px-3 py-2 focus:ring-[#1B3C53] focus:border-[#1B3C53]">
           </div>
+          
+          <div class="mb-6 hidden">
+            <label class="block text-sm font-medium text-[#1B3C53] mb-1" for="status">Status (only admin can change)</label>
+            <input type="text" id="status" name="status" readonly value="{{ old('status', $bookLoan->status) }}"
+              class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm px-3 py-2 focus:ring-[#1B3C53] focus:border-[#1B3C53]">
+          </div>
 
           <p class="mt-1 text-sm text-gray-500">
-            Harga per hari: Rp {{ number_format($bookLoan->bookItem->book->rental_price, 2) }}
+            Rental Price per Day: Rp {{ number_format($bookLoan->bookItem->book->rental_price, 2) }}
           </p>
 
           <div class="mb-6">
-            <label class="block text-sm font-medium text-[#1B3C53] mb-1" for="total_price">Total Price</label>
-            <input type="text" id="total_price" disabled value="Rp. {{ old('total_price', $bookLoan->total_price)}}"
+            <label class="block text-sm font-medium text-[#1B3C53] mb-1" for="loan_price">Total Price</label>
+            <input type="text" name="loan_price" id="loan_price" readonly value="Rp. {{ old('loan_price', $bookLoan->loan_price)}}"
               class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm px-3 py-2 bg-gray-100">
           </div>
 
-          <div class="flex justify-end space-x-3">
-            <a href="{{ route('member.book-loans.index') }}"
-              class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2.5 rounded-lg transition-all duration-200">
+          <div class="flex justify-center md:justify-end space-x-3">
+            <a href="javascript:history.back()"
+              class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2.5 rounded-full transition-all duration-200">
               Cancel
             </a>
             <button type="submit"
-              class="bg-[#1B3C53] hover:bg-[#163040] text-white px-5 py-2.5 rounded-lg transition-all duration-200">
+              class="bg-[#1B3C53] hover:bg-[#163040] text-white px-5 py-2.5 rounded-full transition-all duration-200">
               Update Loan
             </button>
           </div>
@@ -63,7 +73,7 @@
       document.addEventListener('DOMContentLoaded', function () {
         const loanDateInput = document.getElementById('loan_date');
         const dueDateInput = document.getElementById('due_date');
-        const totalPriceInput = document.getElementById('total_price');
+        const totalPriceInput = document.getElementById('loan_price');
 
         const pricePerDay = {{ $bookLoan->bookItem->book->rental_price }};
 
@@ -80,12 +90,8 @@
           
           const totalPrice = diffDays * pricePerDay;
           
-          // Format mata uang
-          totalPriceInput.value = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 2
-          }).format(totalPrice);
+          
+          totalPriceInput.value = totalPrice
         }
 
         loanDateInput.addEventListener('change', calculateTotal);

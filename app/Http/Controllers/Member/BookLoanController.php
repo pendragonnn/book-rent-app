@@ -3,176 +3,190 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
-use App\Models\BookItem;
 use App\Models\BookLoan;
+use App\Models\BookItem;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BookLoanController extends Controller
 {
-  public function index()
-  {
-    $user = Auth::user();
-
-    $status = ['payment_pending', 'admin_validation', 'borrowed', 'returned', 'cancelled'];
-
-    $loans = BookLoan::with('bookItem.book')->where('user_id', $user->id)->latest()->paginate(10);
-
-    return view('member.book_loans.index', compact('loans', 'status'));
-  }
-
-  public function show(BookLoan $bookLoan)
-  {
-    if ($bookLoan->user_id !== Auth::id()) {
-      abort(403);
+    public function index()
+    {
+        $loans = BookLoan::with(['receipts', 'bookItem.book'])
+            ->whereHas('receipts', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view('member.book_loans.index', compact('loans'));
     }
 
-    return view('member.book_loans.show', compact('bookLoan'));
-  }
-
-  public function create(BookItem $bookItem)
-  {
-    if ($bookItem->status !== 'available') {
-      return redirect()->route('member.catalog.index')->with('error', 'Buku tidak tersedia.');
+    public function create($id)
+    {
+        $users = User::where('role_id', 2)->get();
+        $bookItems = BookItem::with('book')->findOrFail($id);
+        return view('member.book_loans.create', compact('users', 'bookItems'));
     }
 
-    return view('member.book_loans.create', compact('bookItem'));
-  }
 
-  public function store(Request $request)
-  {
-    $validated = $request->validate([
-      'book_item_id' => 'required|exists:book_items,id',
-      'loan_date' => 'required|date|after_or_equal:today',
-      'due_date' => 'required|date|after_or_equal:loan_date',
-    ]);
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'book_item_id' => 'required|exists:book_items,id',
+            'loan_date' => 'required|date|after_or_equal:today',
+            'due_date' => 'required|date|after_or_equal:loan_date',
+        ]);
 
-    $bookItem = BookItem::findOrFail($validated['book_item_id']);
+        $bookItem = BookItem::findOrFail($validated['book_item_id']);
 
-    if ($bookItem->status !== 'available') {
-      return back()->with('error', 'Buku sudah dipinjam.');
+        if ($bookItem->status !== 'available') {
+            return back()->with('error', 'Buku sudah dipinjam.');
+        }
+
+        $start = \Carbon\Carbon::parse($validated['loan_date']);
+        $end = \Carbon\Carbon::parse($validated['due_date']);
+        $days = $start->diffInDays($end);
+
+        $pricePerDay = $bookItem->book->rental_price;
+        $totalPrice = $pricePerDay * $days;
+
+        $loan = BookLoan::create([
+            'user_id' => Auth::id(),
+            'book_item_id' => $bookItem->id,
+            'loan_date' => $validated['loan_date'],
+            'due_date' => $validated['due_date'],
+            'status' => 'payment_pending',
+            'loan_price' => $totalPrice,
+        ]);
+
+        $bookItem->update(['status' => 'reserved']);
+
+        return redirect()->route('member.book-loans.index')->with('success', 'Peminjaman berhasil diajukan.');
     }
 
-    $start = \Carbon\Carbon::parse($validated['loan_date']);
-    $end = \Carbon\Carbon::parse($validated['due_date']);
-    $days = $start->diffInDays($end);
-
-    $pricePerDay = $bookItem->book->rental_price;
-    $totalPrice = $pricePerDay * $days;
-
-    $loan = BookLoan::create([
-      'user_id' => Auth::id(),
-      'book_item_id' => $bookItem->id,
-      'loan_date' => $validated['loan_date'],
-      'due_date' => $validated['due_date'],
-      'status' => 'payment_pending',
-      'total_price' => $totalPrice,
-    ]);
-
-    $bookItem->update(['status' => 'reserved']);
-
-    return redirect()->route('member.dashboard')->with('success', 'Peminjaman berhasil diajukan.');
-  }
-
-  public function edit(BookLoan $bookLoan)
-  {
-    if ($bookLoan->user_id !== Auth::id()) {
-      abort(403);
+    public function show(BookLoan $bookLoan)
+    {
+        $bookLoan->load(['user', 'bookItem.book']);
+        return view('member.book_loans.show', compact('bookLoan'));
     }
 
-    if (!in_array($bookLoan->status, ['payment_pending', 'admin_validation'])) {
-      return back()->with('error', 'You can only edit loans that are in payment or validation phase.');
+    public function edit(BookLoan $bookLoan)
+    {
+        $users = User::where('role_id', 2)->get();
+        $bookLoan->load(['user', 'bookItem.book']);
+        $bookItems = BookItem::where('status', 'available')->get();
+        $statuses = ['payment_pending', 'admin_validation', 'borrowed', 'returned', 'cancelled'];
+        return view('member.book_loans.edit', compact('bookLoan', 'statuses', 'users', 'bookItems'));
     }
 
-    return view('member.book_loans.edit', compact('bookLoan'));
-  }
+    public function update(Request $request, BookLoan $bookLoan)
+    {
+        // dd($request->toArray());
+        // dd($request->loan_price);
+        $status = $request->status;
 
-  public function update(Request $request, BookLoan $bookLoan)
-  {
-    if ($bookLoan->user_id !== Auth::id()) {
-      abort(403);
+        if ($status === 'borrowed' && $bookLoan->status === 'admin_validation') {
+            $bookLoan->update(['status' => 'borrowed']);
+            $bookLoan->bookItem->update(['status' => 'borrowed']);
+            return redirect()->route('admin.book-loans.index')->with('success', 'Loan approved.');
+        }
+
+        if ($status === 'cancelled' && $bookLoan->status === 'admin_validation') {
+            $bookLoan->update(['status' => 'cancelled']);
+            $bookLoan->bookItem->update(['status' => 'available']);
+            return redirect()->route('admin.book-loans.index')->with('success', 'Loan cancelled.');
+        }
+
+        $validated = $request->validate([
+            'loan_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:loan_date',
+            'status' => 'required|string|in:admin_validation',
+            'loan_price' => 'required|numeric'
+        ]);
+
+        $bookLoan->update($validated);
+
+        // dd($bookLoan->toArray());
+
+        if ($bookLoan->receipt_id) {
+            $receipt = $bookLoan->receipts()->first();
+            if ($receipt) {
+                $totalPrice = BookLoan::where('receipt_id', $bookLoan->receipt_id)->where('status', 'admin_validation')->sum('loan_price');
+                $receipt->update(['total_price' => $totalPrice]);
+            }
+        }
+
+        if ($validated['status'] === 'borrowed') {
+            $bookLoan->bookItem->update(['status' => 'borrowed']);
+        }
+
+        return redirect()->route('member.book-loans.index')->with('success', 'Loan updated.');
     }
 
-    if (!in_array($bookLoan->status, ['payment_pending', 'admin_validation'])) {
-      return back()->with('error', 'You can only update loans that are in payment or validation phase.');
+    public function destroy(BookLoan $bookLoan)
+    {
+        $bookLoan->delete();
+        return redirect()->route('member.book-loans.index')->with('success', 'Loan deleted.');
     }
 
-    $validated = $request->validate([
-      'loan_date' => 'required|date',
-      'due_date' => 'required|date|after_or_equal:loan_date',
-    ]);
+    public function returnLoan(BookLoan $bookLoan)
+    {
+        if (!$bookLoan->receipts()->where('user_id', Auth::id())->exists()) {
+            abort(403);
+        }
 
-    $start = \Carbon\Carbon::parse($validated['loan_date']);
-    $end = \Carbon\Carbon::parse($validated['due_date']);
-    $days = $start->diffInDays($end);
-    $pricePerDay = $bookLoan->bookItem->book->rental_price;
-    $totalPrice = $pricePerDay * $days;
+        // cek status dulu
+        if ($bookLoan->status !== 'borrowed') {
+            return back()->with('error', 'Only borrowed books can be returned.');
+        }
 
-    $bookLoan->update([
-      'loan_date' => $validated['loan_date'],
-      'due_date' => $validated['due_date'],
-      'total_price' => $totalPrice,
-    ]);
+        // update status loan
+        $bookLoan->update([
+            'status' => 'returned',
+        ]);
 
-    return redirect()->route('member.book-loans.index')->with('success', 'Loan details updated.');
-  }
+        // update status book item
+        $bookLoan->bookItem->update([
+            'status' => 'available',
+        ]);
 
-  public function uploadPaymentProof(Request $request, BookLoan $bookLoan)
-  {
-    if ($bookLoan->user_id !== Auth::id()) {
-      abort(403);
+        return redirect()->back()->with('success', 'Book has been successfully returned.');
     }
 
-    $request->validate([
-      'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+    public function cancelLoan(BookLoan $bookLoan)
+    {
+        // cek user pemilik
+        if (!$bookLoan->receipts()->where('user_id', Auth::id())->exists()) {
+            abort(403);
+        }
 
-    $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+        // hanya boleh cancel ketika masih admin_validation
+        if ($bookLoan->status !== 'admin_validation') {
+            return back()->with('error', 'Hanya pinjaman yang menunggu validasi admin yang bisa dibatalkan.');
+        }
 
-    $bookLoan->update([
-      'payment_proof' => $path,
-      'status' => 'admin_validation',
-    ]);
+        // update loan status
+        $bookLoan->update(['status' => 'cancelled']);
 
-    return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload!');
-  }
+        // update book item status
+        if ($bookLoan->bookItem) {
+            $bookLoan->bookItem->update(['status' => 'available']);
+        }
 
-  public function returnLoan(BookLoan $bookLoan)
-  {
-    if ($bookLoan->user_id !== Auth::id()) {
-      abort(403);
+        // update total_price di receipt
+        foreach ($bookLoan->receipts as $receipt) {
+            $newTotal = $receipt->total_price - $bookLoan->loan_price;
+            $receipt->update(['total_price' => max(0, $newTotal)]);
+
+            // kalau semua loan di receipt cancelled → receipt juga rejected
+            if ($receipt->loans()->where('status', '!=', 'cancelled')->count() === 0) {
+                $receipt->update(['status' => 'cancelled']);
+            }
+        }
+
+        return back()->with('success', 'Peminjaman berhasil dibatalkan.');
     }
-
-    if ($bookLoan->status !== 'borrowed') {
-      return back()->with('error', 'Only borrowed books can be returned.');
-    }
-
-    $bookLoan->update([
-      'status' => 'returned',
-    ]);
-
-    $bookLoan->bookItem->update([
-      'status' => 'available',
-    ]);
-
-    return redirect()->back()->with('success', 'Book has been successfully returned.');
-  }
-
-  public function cancel(BookLoan $bookLoan)
-  {
-    if ($bookLoan->user_id !== Auth::id()) {
-      abort(403);
-    }
-
-    if ($bookLoan->status !== 'payment_pending' && $bookLoan->status !== 'admin_validation') {
-      return back()->with('error', 'You can only cancel loans that are still in payment pending status.');
-    }
-
-    $bookLoan->update(['status' => 'cancelled']);
-    $bookLoan->bookItem->update(['status' => 'available']);
-
-    return back()->with('success', 'Loan has been cancelled.');
-  }
 
 
 }

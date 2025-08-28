@@ -1,4 +1,7 @@
 <x-app-layout>
+  <x-slot:title>
+        {{ __('Manage Books') }} - {{ config('app.name') }}
+    </x-slot>
   <x-slot name="header">
     <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
       {{ __('Book List') }}
@@ -21,18 +24,19 @@
             class="border-gray-300 rounded px-3 py-1 text-sm focus:ring-[#D2C1B6] focus:border-[#D2C1B6]">
             <option value="">All Categories</option>
             @foreach ($categories as $category)
-        <option value="{{ $category->name }}">{{ $category->name }}</option>
-      @endforeach
+              <option value="{{ $category->name }}">{{ $category->name }}</option>
+            @endforeach
           </select>
         </div>
       </div>
 
-      {{-- Success Message --}}
       @if (session('success'))
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded-md my-6">
-      {{ session('success') }}
-      </div>
-    @endif
+        <div class="mb-4 p-3 rounded bg-green-100 text-green-700"> {{ session('success') }} </div>
+      @endif
+
+      @if (session('error'))
+        <div class="mb-4 p-3 rounded bg-red-100 text-red-700"> {{ session('error') }} </div>
+      @endif
 
       {{-- Table --}}
       <div class="bg-white shadow-xl sm:rounded-lg p-4 border border-[#D2C1B6] mt-4">
@@ -52,46 +56,52 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
               @foreach ($books as $book)
-          <tr class="hover:bg-gray-50 transition font-semibold">
-            <td></td>
-          <td class="px-4 py-2">{{ $book->title }}</td>
-          <td class="px-4 py-2">{{ $book->author }}</td>
-          <td class="px-4 py-2">{{ $book->category->name ?? '-' }}</td>
-          <td class="px-4 py-2">Rp{{ number_format($book->rental_price, 0, ',', '.') }}</td>
-          <td class="px-4 py-2 text-center">{{ $book->items->where('status', 'available')->count() }}</td>
-          <td class="px-4 py-2 text-center">{{ $book->items->count() }}</td>
-          <td class="px-4 py-2 flex gap-1">
-            <a href="{{ route('admin.books.show', $book) }}"
-            class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 text-xs rounded-md transition-colors duration-300 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-            Detail
-            </a>
-            <a href="{{ route('admin.books.edit', $book) }}"
-            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 text-xs rounded-md transition-colors duration-300 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="size-4 mr-1">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                </svg>
-            Edit
-            </a>
-            <button onclick="openDeleteModal({{ $book->id }})"
-            class="bg-red-600 hover:bg-red-700 text-white rounded-md px-3 py-1 text-xs transition-colors duration-300 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="size-4 mr-1">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                </svg>
-            Delete
-            </button>
-          </td>
-          </tr>
-        @endforeach
+                <tr class="hover:bg-gray-50 transition font-semibold">
+                  <td></td>
+                  <td class="px-4 py-2">{{ $book->title }}</td>
+                  <td class="px-4 py-2">{{ $book->author }}</td>
+                  <td class="px-4 py-2"> 
+                  @if($book->category)
+                    {{ $book->category->name }}
+                  @else
+                      <span class="text-gray-500 italic">Kategori sudah terhapus</span>
+                  @endif
+                  </td>
+                  <td class="px-4 py-2">Rp{{ number_format($book->rental_price, 0, ',', '.') }}</td>
+                  <td class="px-4 py-2 text-center">{{ $book->items->where('status', 'available')->count() }}</td>
+                  <td class="px-4 py-2 text-center">{{ $book->items->count() }}</td>
+                  <td class="px-4 py-2">
+                    <a href="{{ route('admin.books.show', $book) }}"
+                      class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 text-xs rounded-md transition-colors duration-300 flex flex-wrap items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      Detail
+                    </a>
+                    {{-- <a href="{{ route('admin.books.edit', $book) }}"
+                      class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 text-xs rounded-md transition-colors duration-300 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-4 mr-1">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                      </svg>
+                      Edit
+                    </a>
+                    <button onclick="openDeleteModal({{ $book->id }})"
+                      class="bg-red-600 hover:bg-red-700 text-white rounded-md px-3 py-1 text-xs transition-colors duration-300 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-4 mr-1">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                      Delete
+                    </button> --}}
+                  </td>
+                </tr>
+              @endforeach
             </tbody>
           </table>
         </div>
@@ -128,56 +138,56 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script>
-    function openDeleteModal(bookId) {
-      const form = document.getElementById('deleteForm');
-      form.action = `/admin/books/${bookId}`;
-      document.getElementById('deleteModal').classList.remove('hidden');
-      document.getElementById('deleteModal').classList.add('flex');
-    }
-
-    function closeDeleteModal() {
-      document.getElementById('deleteModal').classList.add('hidden');
-    }
-
-    let table = $('#books-table').DataTable({
-      responsive: true,
-      processing: true,
-      paging: true,
-      info: true,
-      language: {
-      search: "Search:",
-      lengthMenu: "Show _MENU_ entries",
-      zeroRecords: "No books found",
-      info: "Showing _START_ to _END_ of _TOTAL_ books",
-      paginate: {
-        previous: "Prev",
-        next: "Next"
+      function openDeleteModal(bookId) {
+        const form = document.getElementById('deleteForm');
+        form.action = `/admin/books/${bookId}`;
+        document.getElementById('deleteModal').classList.remove('hidden');
+        document.getElementById('deleteModal').classList.add('flex');
       }
-      },
-      columnDefs: [
-      {
-        searchable: false,
-        orderable: false,
-        targets: 0 
+
+      function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
       }
-      ],
-      order: [[1, 'asc']] 
-    }).on('order.dt search.dt', function () {
-      let table = $('#books-table').DataTable();
-      table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-      cell.innerHTML = i + 1;
+
+      let table = $('#books-table').DataTable({
+        responsive: true,
+        processing: true,
+        paging: true,
+        info: true,
+        language: {
+          search: "Search by title/category:",
+          lengthMenu: "Show _MENU_ entries",
+          zeroRecords: "No books found",
+          info: "Showing _START_ to _END_ of _TOTAL_ books",
+          paginate: {
+            previous: "Prev",
+            next: "Next"
+          }
+        },
+        columnDefs: [
+          {
+            searchable: false,
+            orderable: false,
+            targets: [0, 2, 4, 5, 6, 7]
+          }
+        ],
+        order: [[1, 'asc']]
+      }).on('order.dt search.dt', function () {
+        let table = $('#books-table').DataTable();
+        table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+          cell.innerHTML = i + 1;
+        });
+      }).draw();
+
+      $('#filter-category').on('change', function () {
+        let selected = $(this).val();
+        console.log(selected)
+        if (selected) {
+          table.column(3).search('^' + selected + '$', true, false).draw();
+        } else {
+          table.column(3).search('').draw();
+        }
       });
-    }).draw();
-
-    $('#filter-category').on('change', function () {
-      let selected = $(this).val();
-      console.log(selected)
-      if (selected) {
-      table.column(3).search('^' + selected + '$', true, false).draw();
-      } else {
-      table.column(3).search('').draw();
-      }
-    });
     </script>
   @endpush
 </x-app-layout>
