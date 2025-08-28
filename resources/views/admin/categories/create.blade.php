@@ -1,4 +1,7 @@
 <x-app-layout>
+    <x-slot:title>
+        {{ __('Create Category') }} - {{ config('app.name') }}
+    </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
             {{ __('Add New Category') }}
@@ -25,11 +28,11 @@
 
                     <div class="flex justify-end gap-3 mt-6">
                         <a href="{{ route('admin.categories.index') }}"
-                           class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded hover:bg-gray-600">
+                           class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-full hover:bg-gray-600">
                             Cancel
                         </a>
                         <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-[#1B3C53] text-white text-sm font-medium rounded hover:bg-[#162e3f]">
+                                class="inline-flex items-center px-4 py-2 bg-[#1B3C53] text-white text-sm font-medium rounded-full hover:bg-[#162e3f]">
                             Save
                         </button>
                     </div>

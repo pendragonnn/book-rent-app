@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookItem;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Category;
+
 
 class BookController extends Controller
 {
@@ -83,26 +85,67 @@ class BookController extends Controller
             $validated['cover_image'] = $filename;
         }
 
-        $book->update($validated);
+        // Hitung stok existing
+        $currentStock = $book->items()->count();
+        $availableCount = $book->items()->where('status', 'available')->count();
 
-        if ($request->filled('stock') && is_numeric($request->stock)) {
-            $currentStock = $book->items()->count();
-            $newStock = intval($request->stock);
+        $newStock = $request->stock;
 
-            if ($newStock > $currentStock) {
-                $difference = $newStock - $currentStock;
-                for ($i = 0; $i < $difference; $i++) {
-                    $book->items()->create(['status' => 'available']);
-                }
+        if ($newStock > $currentStock) {
+            // Tambah stok → insert BookItem baru
+            $itemsToAdd = $newStock - $currentStock;
+            for ($i = 0; $i < $itemsToAdd; $i++) {
+                $book->items()->create([
+                    'status' => 'available',
+                ]);
             }
+        } elseif ($newStock < $currentStock) {
+            // Kurangi stok → cek apakah cukup available
+            $itemsToRemove = $currentStock - $newStock;
+
+            if ($itemsToRemove > $availableCount) {
+                return back()->withErrors([
+                    'stock' => 'Tidak bisa mengurangi stok karena ada buku yang masih dipinjam.',
+                ]);
+            }
+
+            $book->items()
+                ->where('status', 'available')
+                ->take($itemsToRemove)
+                ->delete();
         }
+        $book->update($validated);
 
         return redirect()->route('admin.books.index')->with('success', 'Book updated successfully!');
     }
 
-    public function destroy(Book $book)
+    public function destroy(Book $book, Request $request)
     {
+        // Validasi konfirmasi
+        $confirmationText = "saya mengetahui bahwa penghapusan ini akan mempengaruhi data lain dan saya sudah memeriksanya";
+        if ($request->input('delete_confirmation') !== $confirmationText) {
+            return redirect()->back()
+                ->with('error', 'Konfirmasi penghapusan salah. Harap ketik kalimat dengan benar.');
+        }
+        // // cek apakah masih ada item yang dipinjam
+        $hasBorrowed = $book->items()->where('status', 'borrowed')->exists();
+        $hasReserved = $book->items()->where('status', 'reserved')->exists();
+
+        // // dd($hasBorrowed);
+
+        if ($hasBorrowed) {
+            return redirect()->route('admin.books.index')
+                ->with('error', 'Buku tidak bisa dihapus karena masih ada item yang sedang dipinjam.');
+        } elseif ($hasReserved) {
+            return redirect()->route('admin.books.index')
+                ->with('error', 'Buku tidak bisa dihapus karena masih ada item yang sudah direservasi.');
+        }
+
+        // kalau aman → hapus semua item dulu baru bukunya
+        $book->items()->delete();
         $book->delete();
-        return redirect()->route('admin.books.index')->with('success', 'Book deleted successfully!');
+
+        return redirect()->route('admin.books.index')->with('success', 'Buku berhasil dihapus.');
     }
+
 }

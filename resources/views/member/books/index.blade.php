@@ -1,11 +1,15 @@
 <x-app-layout>
+    {{-- Define the title for the browser tab --}}
+    <x-slot:title>
+        {{ __('Browse Books') }} - {{ config('app.name') }}
+    </x-slot>
     <x-slot name="header">
         <div class="flex items-center justify-between bg-white">
             <h2 class="font-bold text-xl text-[#1B3C53] leading-tight">
-                {{ __('Katalog Buku') }}
+                {{ __('Book Catalog') }}
             </h2>
             <a href="{{ route('member.cart.index') }}"
-                class="bg-[#1B3C53] hover:border-[#1B3C53] px-4 py-2 rounded-md text-md font-medium text-gray-500 hover:text-white  transition duration-300">
+                class="bg-[#1B3C53] hover:border-[#1B3C53] px-4 py-2 rounded-full text-md font-medium text-gray-500 hover:text-white  transition duration-300">
                 🛒
                 My Cart ({{ count(session('cart', [])) }})
             </a>
@@ -16,15 +20,15 @@
         <div class="max-w-7xl mx-auto px-6 space-y-8">
             {{-- Filter & Search Section --}}
             <div class="bg-white shadow-lg rounded-xl p-6 mb-8">
-                <h3 class="text-xl font-bold text-[#1B3C53] mb-5">Cari dan Filter Buku</h3>
+                <h3 class="text-xl font-bold text-[#1B3C53] mb-5">Search and Filter Book</h3>
                 <form method="GET" class="flex flex-col md:flex-row items-center gap-4">
                     <input type="text" name="search" value="{{ request('search') }}"
                         class="w-full md:flex-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 text-[#1B3C53] placeholder-gray-500 transition-colors duration-200"
-                        placeholder="Cari berdasarkan judul atau penulis...">
+                        placeholder="Search by title or author...">
 
                     <select name="category"
                         class="w-full md:w-1/4 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 text-[#1B3C53] transition-colors duration-200">
-                        <option value="">Semua Kategori</option>
+                        <option value="">All Categories</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}
@@ -33,13 +37,13 @@
                     </select>
 
                     <button type="submit"
-                        class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-md transition-colors duration-300 shadow-md flex items-center justify-center">
+                        class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full transition-colors duration-300 shadow-md flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        Cari
+                        Search
                     </button>
                     {{-- Clear Filter Button --}}
                     @if(request('search') || request('category'))
@@ -59,7 +63,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @forelse ($books as $book)
                     <div
-                        class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-102 hover:shadow-xl flex flex-col">
+                        class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-200 hover:shadow-xl flex flex-col">
                         {{-- Book Cover Image --}}
                         <img src="{{ asset('covers/' . $book->cover_image) }}" alt="{{ $book->title }}"
                             class="w-full h-60 object-cover rounded-t-xl">
@@ -69,10 +73,10 @@
                                 {{-- Book Title --}}
                                 <h3 class="text-xl font-bold text-[#1B3C53] mb-1">{{ $book->title }}</h3>
                                 {{-- Author & Category --}}
-                                <p class="text-sm text-gray-700">Penulis: {{ $book->author }}</p>
-                                <p class="text-sm text-gray-700">Kategori: {{ $book->category->name ?? '-' }}</p>
+                                <p class="text-sm text-gray-700">Author: {{ $book->author }}</p>
+                                <p class="text-sm text-gray-700">Category: {{ $book->category->name ?? '-' }}</p>
                                 {{-- Available Items Count --}}
-                                <p class="text-sm text-gray-700 mt-2">Tersedia: <span
+                                <p class="text-sm text-gray-700 mt-2">Available: <span
                                         class="font-semibold {{ $book->availableItemsCount() > 0 ? 'text-green-600' : 'text-red-500' }}">{{ $book->availableItemsCount() }}</span>
                                 </p>
                             </div>
@@ -87,7 +91,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
                                 </svg>
 
-                                <span class="text-base font-semibold text-gray-800">Harga Rental:</span>
+                                <span class="text-base font-semibold text-gray-800">Rental Price:</span>
                                 <span class="text-md font-bold text-[#1B3C53]">
                                     {{-- Assuming $book->rental_price exists. Adjust if your model has a different
                                     attribute. --}}
@@ -98,7 +102,7 @@
                             {{-- Action Buttons --}}
                             <div class="mt-4 flex justify-between items-center space-x-2">
                                 <a href="{{ route('member.books.show', $book) }}"
-                                    class="flex flex-1 items-center justify-center gap-x-3 text-center text-base bg-[#1B3C53] hover:bg-[#1B3C53]/90 text-white px-4 py-2 rounded-md transition-colors duration-300 shadow-md">
+                                    class="flex flex-1 items-center justify-center gap-x-3 text-center text-base bg-[#1B3C53] hover:bg-[#1B3C53]/90 text-white px-4 py-2 rounded-full transition-colors duration-300 shadow-md">
                                     Detail
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -113,8 +117,8 @@
 
                                 @if ($availableItem)
                                     <a href="{{ route('member.book-loans.create', $availableItem->id) }}"
-                                        class="flex flex-1 justify-center gap-x-2 text-center text-base bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors duration-300 shadow-md">
-                                        Pinjam
+                                        class="flex flex-1 justify-center gap-x-2 text-center text-base bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors duration-300 shadow-md">
+                                        Borrow
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.5" stroke="currentColor" class="size-6">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -122,15 +126,14 @@
                                         </svg>
                                     </a>
                                 @else
-                                    <span class="flex-1 text-center text-base text-red-500 font-semibold py-2">Tidak
-                                        Tersedia</span>
+                                    <span class="flex-1 text-center text-base text-red-500 font-semibold py-2">Not Available</span>
                                 @endif
                             </div>
                         </div>
                     </div>
                 @empty
                     <div class="col-span-full text-center py-10 bg-white rounded-xl shadow-lg text-gray-600">
-                        <p class="text-lg font-medium mb-4">Tidak ada buku yang ditemukan.</p>
+                        <p class="text-lg font-medium mb-4">No books found.</p>
                     </div>
                 @endforelse
             </div>

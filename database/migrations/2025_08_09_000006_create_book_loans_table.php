@@ -8,13 +8,12 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('book_loans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('book_item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('receipt_id')->constrained()->onDelete('cascade');
             $table->date('loan_date');
             $table->date('due_date');
-            $table->enum('status', ['payment_pending', 'admin_validation', 'cancelled', 'borrowed', 'returned'])
-                  ->default('payment_pending');
             $table->decimal('loan_price', 10, 2)->nullable();
+            $table->enum('status', ['admin_validation', 'cancelled', 'borrowed', 'returned'])->default('admin_validation');
             $table->timestamps();
         });
     }

@@ -14,9 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->enum('payment_method', ['bank_transfer', 'ewallet', 'cash']);
-            $table->decimal('total_price', 10, 2);
             $table->string('payment_proof')->nullable();
-            $table->enum('status', ['pending', 'paid', 'verified', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'paid', 'verified', 'rejected', 'cancelled'])
+                  ->default('pending');
+            $table->decimal('total_price', 10, 2);
             $table->timestamps();
         });
     }

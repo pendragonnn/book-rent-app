@@ -44,8 +44,14 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
     }
 
-    public function destroy(Category $category)
+    public function destroy(Category $category, Request $request)
     {
+        // Validasi konfirmasi
+        $confirmationText = "saya mengetahui bahwa penghapusan ini akan mempengaruhi data lain dan saya sudah memeriksanya";
+        if ($request->input('delete_confirmation') !== $confirmationText) {
+            return redirect()->back()
+                ->with('error', 'Konfirmasi penghapusan salah. Harap ketik kalimat dengan benar.');
+        }
         $category->delete();
         return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
     }

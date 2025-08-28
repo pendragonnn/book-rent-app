@@ -1,19 +1,19 @@
 <x-app-layout>
   <x-slot:title>
-        {{ __('Manage Book Loans') }} - {{ config('app.name') }}
+        {{ __('Book receipts') }} - {{ config('app.name') }}
     </x-slot>
   <x-slot name="header">
     <h2 class="font-semibold text-xl text-[#1B3C53] leading-tight">
-      {{ __('Book Loan List') }}
+      {{ __('Book Loan Receipts') }}
     </h2>
   </x-slot>
 
   <div class="py-8" style="background-color: #F9F3EF">
     <div class="max-w-7xl mx-auto px-6">
       <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <a href="{{ route('admin.book-loans.create') }}"
+        <a href="{{ route('admin.book-receipts.create') }}"
           class="bg-[#1B3C53] hover:bg-[#163145] text-white font-semibold py-2 px-4 rounded text-sm shadow transition">
-          + Add Book Loan
+          + Add Book Receipt
         </a>
 
         <!-- Filter by Status -->
@@ -39,15 +39,13 @@
       @endif
 
       <div class="bg-white border border-[#d2c1b6] overflow-x-auto shadow-lg md:rounded-lg p-4">
-        <table id="loans-table" class="min-w-full divide-y divide-gray-200 text-sm">
+        <table id="receipts-table" class="min-w-full divide-y divide-gray-200 text-sm">
           <thead class="bg-blue-50 text-blue-800 uppercase">
             <tr>
               <th class="px-4 py-2 text-left">No</th>
               <th class="px-4 py-2 text-left">User</th>
-              <th class="px-4 py-2 text-left">Book Title</th>
-              <th class="px-4 py-2 text-left">Created at</th>
-              <th class="px-4 py-2 text-left">Loan Date</th>
-              <th class="px-4 py-2 text-left">Due Date</th>
+              <th class="px-4 py-2 text-left">Created At</th>
+              <th class="px-4 py-2 text-left">Payment Method</th>
               <th class="px-4 py-2 text-left">Total Price</th>
               <th class="px-4 py-2 text-left">Payment Proof</th>
               <th class="px-4 py-2 text-left">Status</th>
@@ -55,63 +53,51 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            @foreach ($loans as $loan)
+            @foreach ($receipts as $receipt)
               @php
-                $statusDisplay = ucwords(str_replace('_', ' ', $loan->status));
-                $badgeColor = match ($loan->status) {
-                  'payment_pending' => 'bg-blue-500',
-                  'admin_validation' => 'bg-indigo-500',
-                  'borrowed' => 'bg-yellow-500',
-                  'returned' => 'bg-green-500',
-                  'cancelled' => 'bg-red-500',
+                $statusDisplay = ucwords(str_replace('_', ' ', $receipt->status));
+                $badgeColor = match ($receipt->status) {
+                  'pending' => 'bg-blue-500',
+                  'paid' => 'bg-green-500',
+                  'verified' => 'bg-indigo-500',
+                  'rejected' => 'bg-red-500',
                   default => 'bg-gray-500',
                 };
               @endphp
               <tr class="hover:bg-gray-50 transition font-semibold">
                 <td></td>
+                <td class="px-4 py-2 {{ $receipt->user ? '' : 'italic text-gray-500' }}">
+                  {{ $receipt->user?->name ?? 'User Deleted' }}
+                </td>
+
+
                 <td class="px-4 py-2">
-                  @foreach($loan->receipts as $receipt)
-                    @if($receipt->user)
-                      {{ $receipt->user->name }}
-                    @else
-                      <span class="text-gray-500 italic">User Deleted</span>
-                    @endif
-                    @if(!$loop->last), @endif
-                  @endforeach
+                  {{ $receipt->created_at->format('d M Y')}}
+                </td>
+                <td class="px-4 py-2">{{ ucwords(str_replace('_', ' ', $receipt->payment_method)) }}</td>
+                <td class="px-4 py-2">
+                  @if ($receipt->status === 'cancelled' || $receipt->status === 'rejected')
+                    -
+                  @else
+                    Rp{{ number_format($receipt->total_price, 0, ',', '.') }}
+                  @endif
                 </td>
                 <td class="px-4 py-2">
-                  @if($loan->bookItem)
-                      {{ $loan->bookItem->book->title }}
-                    @else
-                      <span class="text-gray-500 italic">Book Deleted</span>
-                    @endif
-                  {{-- {{ $loan->bookItem->book->title }} --}}
-                </td>
-                <td class="px-4 py-2">{{ $loan->created_at->format('d M Y') }}</td>
-                <td class="px-4 py-2">{{ $loan->loan_date }}</td>
-                <td class="px-4 py-2">{{ $loan->due_date }}</td>
-                <td class="px-4 py-2">Rp{{ number_format($loan->loan_price, 0, ',', '.') }}</td>
-                <td class="px-4 py-2">
-                  @php
-                    $receipt = $loan->receipts->first();
-                  @endphp
-                  @if ($receipt && $receipt->payment_proof)
-                    <span class="text-green-600 font-medium text-sm">Paid</span>
+                  @if ($receipt->payment_proof)
                     <a href="{{ asset('storage/' . $receipt->payment_proof) }}" target="_blank"
                       class="text-[#1B3C53] underline text-sm">[View Proof]</a>
                   @else
-                    <span class="text-red-500 font-medium text-sm">Unpaid</span>
+                    <span class="text-red-500 font-medium text-sm">Not Uploaded</span>
                   @endif
                 </td>
-
-                <td class="px-4 py-">
+                <td class="px-4 py-2">
                   <span
                     class="text-white flex items-center justify-center text-center px-2 py-1 rounded-full text-xs font-semibold shadow-sm {{ $badgeColor }}">
                     {{ $statusDisplay }}
                   </span>
                 </td>
-                <td class="px-4 py-2">
-                  <a href="{{ route('admin.book-loans.show', $loan->id) }}"
+                <td class="px-4 py-2 flex">
+                  <a href="{{ route('admin.book-receipts.show', $receipt) }}"
                     class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 text-xs rounded-md transition-colors duration-300 flex flex-wrap items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
                       stroke="currentColor" stroke-width="2">
@@ -122,7 +108,6 @@
                     Detail
                   </a>
 
-
                 </td>
               </tr>
             @endforeach
@@ -132,16 +117,13 @@
     </div>
   </div>
 
-
-
   @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
 
-
-      let table = $('#loans-table').DataTable({
+      let table = $('#receipts-table').DataTable({
         responsive: true,
         processing: true,
         paging: true,
@@ -149,7 +131,7 @@
         language: {
           search: "Search:",
           lengthMenu: "Show _MENU_ entries",
-          zeroRecords: "No loans found",
+          zeroRecords: "No receipts found",
           info: "Showing _START_ to _END_ of _TOTAL_ loans",
           paginate: {
             previous: "Prev",
@@ -160,12 +142,12 @@
           {
             searchable: false,
             orderable: false,
-            targets: [0, 3, 4, 5, 6, 7, 9]
+            targets: [0, 2, 3, 4, 5, 7]
           }
         ],
-        order: [[3, 'desc']]
+        order: [[2, 'desc']]
       }).on('order.dt search.dt', function () {
-        let table = $('#loans-table').DataTable();
+        let table = $('#receipts-table').DataTable();
         table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
           cell.innerHTML = i + 1;
         });
@@ -174,9 +156,9 @@
       $('#filter-status').on('change', function () {
         let selected = $(this).val();
         if (selected) {
-          table.column(8).search(selected, true, false).draw();
+          table.column(6).search(selected, true, false).draw();
         } else {
-          table.column(8).search('').draw();
+          table.column(6).search('').draw();
         }
       });
     </script>

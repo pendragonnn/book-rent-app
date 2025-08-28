@@ -7,7 +7,7 @@
 
     <div class="py-8">
         <div class="max-w-md mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded shadow-md">
+            <div class="bg-white p-6 rounded-2xl shadow-md">
                 <form method="POST" action="{{ route('admin.categories.update', $category) }}">
                     @csrf
                     @method('PUT')
@@ -26,11 +26,11 @@
 
                     <div class="flex justify-end space-x-2">
                         <a href="{{ route('admin.categories.index') }}"
-                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm transition">
+                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-full text-sm transition">
                             Cancel
                         </a>
                         <button type="submit"
-                            class="px-4 py-2 bg-[#1B3C53] hover:bg-[#162e40] text-white rounded text-sm transition">
+                            class="px-4 py-2 bg-[#1B3C53] hover:bg-[#162e40] text-white rounded-full text-sm transition">
                             Update
                         </button>
                     </div>

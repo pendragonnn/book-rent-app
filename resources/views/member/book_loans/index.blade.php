@@ -1,8 +1,12 @@
 <x-app-layout>
+    {{-- Define the title for the browser tab --}}
+    <x-slot:title>
+        {{ __('My Loans') }} - {{ config('app.name') }}
+    </x-slot>
     <x-slot name="header">
         <div class="flex items-center justify-between bg-white">
             <h2 class="font-bold text-xl text-[#1B3C53] leading-tight">
-                {{ __('Pinjaman Buku Saya') }}
+                {{ __('My Book Loan List') }}
             </h2>
             {{-- Optional: Add a quick action button, e.g., to browse books --}}
             <a href="{{ route('member.books.index') }}"
@@ -12,7 +16,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                 </svg>
-                Jelajahi Buku
+                Browse Books
             </a>
         </div>
     </x-slot>
@@ -22,27 +26,26 @@
 
             {{-- Filter & Search Section --}}
             <div class="bg-white shadow-lg rounded-xl p-6 mb-8">
-                <h3 class="text-xl font-bold text-[#1B3C53] mb-5">Cari dan Filter Pinjaman</h3>
+                <h3 class="text-xl font-bold text-[#1B3C53] mb-5">Search and Find Loans Data</h3>
                 <div class="flex flex-col md:flex-row items-center gap-4">
                     {{-- Search Input (for DataTables global search) --}}
                     <div class="w-full md:flex-1">
-                        <label for="global-search" class="sr-only">Cari Pinjaman:</label>
+                        <label for="global-search" class="sr-only">Search Loans...</label>
                         <input type="search" id="global-search"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 text-[#1B3C53] placeholder-gray-500 transition-colors duration-200"
-                            placeholder="Cari berdasarkan judul buku...">
+                            placeholder="Search by book title...">
                     </div>
 
                     {{-- Filter by Status (for DataTables column search) --}}
                     <div class="w-full md:w-1/4">
-                        <label for="filter-status" class="sr-only">Filter berdasarkan Status:</label>
+                        <label for="filter-status" class="sr-only">Filter by Status:</label>
                         <select id="filter-status"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 text-[#1B3C53] transition-colors duration-200">
-                            <option value="">Semua Status</option>
-                            <option value="payment_pending">Menunggu Pembayaran</option>
-                            <option value="admin_validation">Validasi Admin</option>
-                            <option value="borrowed">Dipinjam</option>
-                            <option value="returned">Dikembalikan</option>
-                            <option value="cancelled">Dibatalkan</option>
+                            <option value="">All Status</option>
+                            <option value="admin_validation">Admin Validation</option>
+                            <option value="borrowed">Borrowed</option>
+                            <option value="returned">Returned</option>
+                            <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
                 </div>
@@ -57,16 +60,17 @@
                             <tr>
                                 <th>No</th>
                                 <th class="text-left px-4 py-3 font-semibold">Book Title</th>
+                                <th class="text-left px-4 py-3 font-semibold">Receipt ID</th>
                                 <th class="text-left px-4 py-3 font-semibold">Created at</th>
                                 <th class="text-left px-4 py-3 font-semibold">Loan Date</th>
                                 <th class="text-left px-4 py-3 font-semibold">Due Date</th>
                                 <th class="text-left px-4 py-3 font-semibold">Total Price</th>
                                 <th class="text-left px-4 py-3 font-semibold">Status</th>
                                 <th class="text-left px-4 py-3 font-semibold">Payment Proof</th>
-                                <th class="text-left px-4 py-3 font-semibold">Aksi</th>
+                                <th class="text-left px-4 py-3 font-semibold">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y font-semibold divide-gray-100">
                             @forelse ($loans as $loan)
                                 @php
                                     $statusColor = match ($loan->status) {
@@ -80,19 +84,22 @@
                                 @endphp
                                 <tr class="hover:bg-gray-50 transition-colors duration-200">
                                     <td></td>
-                                    <td class="px-4 py-3 font-medium text-gray-900">
+                                    <td class="px-4 py-3 font-bold ">
                                         {{ $loan->bookItem->book->title ?? '-' }}
                                     </td>
-                                    <td class="px-4 py-3 text-gray-700">
+                                    <td class="px-4 py-3 font-bold ">
+                                        {{ $loan->receipt_id }}
+                                    </td>
+                                    <td class="px-4 py-3 font-bold">
                                         {{ \Carbon\Carbon::parse($loan->created_at)->format('d M Y') }}
                                     </td>
-                                    <td class="px-4 py-3 text-gray-700">
+                                    <td class="px-4 py-3 font-bold">
                                         {{ \Carbon\Carbon::parse($loan->loan_date)->format('d M Y') }}
                                     </td>
-                                    <td class="px-4 py-3 text-gray-700">
+                                    <td class="px-4 py-3 font-bold">
                                         {{ \Carbon\Carbon::parse($loan->due_date)->format('d M Y') }}
                                     </td>
-                                    <td class="px-4 py-3 text-gray-700">
+                                    <td class="px-4 py-3 font-bold">
                                         Rp{{ number_format($loan->loan_price, 0, ',', '.') }}</td>
                                     <td class="px-4 py-2">
                                         <span
@@ -101,44 +108,20 @@
                                         </span>
                                     </td>
 
-                                    <td class="px-4 py-3">
-                                        @if ($loan->payment_proof)
-                                            <div
-                                                class="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                                                <a href="{{ asset('storage/' . $loan->payment_proof) }}" target="_blank"
-                                                    class="text-blue-600 hover:text-blue-800 underline text-sm flex items-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                                    </svg>
-                                                    Lihat Bukti
-                                                </a>
-
-                                                @if ($loan->status === 'payment_pending' || $loan->status === 'admin_validation')
-                                                    <button onclick="openReuploadModal({{ $loan->id }})"
-                                                        class="text-xs text-yellow-600 hover:text-yellow-800 underline flex items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                        </svg>
-                                                        Ubah Gambar
-                                                    </button>
+                                    <td>
+                                        @if ($loan->receipts->isNotEmpty())
+                                            @foreach ($loan->receipts as $receipt)
+                                                @if ($receipt->payment_proof)
+                                                    <a href="{{ asset('storage/' . $receipt->payment_proof) }}" target="_blank"
+                                                        class="text-blue-600 underline">
+                                                        See Payment Proof
+                                                    </a><br>
+                                                @else
+                                                    <span class="text-gray-500">Not Uploaded</span><br>
                                                 @endif
-                                            </div>
-                                        @elseif ($loan->status === 'payment_pending')
-                                            <button onclick="openUploadModal({{ $loan->id }})"
-                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 text-xs rounded-md transition-colors duration-300 flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                                </svg>
-                                                Upload
-                                            </button>
+                                            @endforeach
                                         @else
-                                            <span class="text-gray-400 text-xs">-</span>
+                                            <span class="text-gray-500">Not Found</span>
                                         @endif
                                     </td>
 
@@ -206,7 +189,7 @@
                                 <tr>
                                     <td></td>
                                     <td colspan="8" class="text-center py-8 text-gray-600">
-                                        <p class="text-lg font-medium mb-4">Anda belum memiliki pinjaman buku.</p>
+                                        <p class="text-lg font-semibold mb-4">You do not yet have a book loan.</p>
                                         <a href="{{ route('member.books.index') }}"
                                             class="inline-flex gap-x-2 items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -215,7 +198,7 @@
                                                     d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                                             </svg>
 
-                                            Mulai Pinjam Buku!
+                                            Start Borrowing Books!
                                         </a>
                                     </td>
                                 </tr>
@@ -279,9 +262,8 @@
     <!-- Cancel Confirmation Modal -->
     <div id="cancelModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
         <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
-            <h2 class="text-xl font-bold mb-4 text-red-600">Batalkan Pinjaman</h2>
-            <p class="text-gray-700 mb-6">Apakah Anda yakin ingin membatalkan pinjaman ini? Tindakan ini tidak dapat
-                dibatalkan.</p>
+            <h2 class="text-xl font-bold mb-4 text-red-600">Cancel Loan</h2>
+            <p class="text-gray-700 mb-6">Are you sure you want to cancel this loan? This action cannot be undone.</p>
 
             <form id="cancelForm" method="POST">
                 @csrf
@@ -289,11 +271,11 @@
                 <div class="flex justify-end space-x-2">
                     <button type="button" onclick="closeCancelModal()"
                         class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors duration-300">
-                        Tidak, Kembali
+                        Back
                     </button>
                     <button type="submit"
                         class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors duration-300">
-                        Ya, Batalkan
+                        Yes, Cancel
                     </button>
                 </div>
             </form>
@@ -343,9 +325,9 @@
                 document.getElementById('cancelModal').classList.remove('flex'); // Ensure flex is removed
             }
 
-            $.fn.dataTable.ext.errMode = function ( settings, helpPage, message ) {
-    console.warn("DataTables suppressed error:", message);
-};
+            $.fn.dataTable.ext.errMode = function (settings, helpPage, message) {
+                console.warn("DataTables suppressed error:", message);
+            };
 
             $(document).ready(function () {
                 let table = $('#loans-table').DataTable({
@@ -357,24 +339,24 @@
                     searching: true, // Keep this true to enable search functionality
                     dom: 'lrtip', // 'l'ength changing input, 'r'processing display, 't'able, 'i'nfo, 'p'agination
                     language: {
-                        search: "Cari:", // This will still be used internally but not displayed
-                        lengthMenu: "Tampilkan _MENU_ entri",
-                        zeroRecords: "Tidak ada pinjaman yang cocok ditemukan",
-                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ pinjaman",
+                        search: "Search:", // This will still be used internally but not displayed
+                        lengthMenu: "Show _MENU_ entries",
+                        zeroRecords: "Loan Data Not Found",
+                        info: "Show _START_ sampai _END_ of _TOTAL_ loans",
                         paginate: {
-                            previous: "Sebelumnya",
-                            next: "Selanjutnya"
+                            previous: "Prev",
+                            next: "Next"
                         }
                     },
                     // Column definitions to ensure correct data for search/filter if needed
                     // For example, if 'Status' column (index 3) needs to be filtered by its raw value:
                     columnDefs: [
                         {
-                            targets: 6, // Target the 'Status' column
+                            targets: 7, // Target the 'Status' column
                             render: function (data, type, row) {
                                 // For filtering/sorting, use the raw status value (e.g., 'payment_pending')
                                 if (type === 'filter' || type === 'sort') {
-                                    return row[6].toLowerCase().replace(/ /g, '_'); // Assuming row[3] contains the status text
+                                    return row[7].toLowerCase().replace(/ /g, '_'); // Assuming row[3] contains the status text
                                 }
                                 return data; // For display, return the HTML badge
                             }
@@ -394,7 +376,7 @@
 
                 // Custom Global Search Input
                 $('#global-search').on('keyup change', function () {
-                    table.search(this.value).draw();
+                    table.column(1).search(this.value).draw();
                 });
 
                 // Filter by Status
@@ -404,10 +386,10 @@
                         // Search exact match in column 3 (Status).
                         // Note: DataTables' search is case-sensitive by default for exact matches.
                         // We convert the selected value to match the format in the table for filtering.
-                        table.column(6).search(selected, true, false).draw();
+                        table.column(7).search(selected, true, false).draw();
                     } else {
-                        // Clear filter for column 6
-                        table.column(6).search('').draw();
+                        // Clear filter for column 7
+                        table.column(7).search('').draw();
                     }
                 });
             });
