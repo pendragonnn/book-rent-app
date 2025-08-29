@@ -5,11 +5,15 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('book_loans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_item_id')->constrained()->onDelete('cascade');
-            $table->foreignId('receipt_id')->constrained()->onDelete('cascade');
+            $table->foreignId('receipt_id')
+                ->nullable()
+                ->constrained('book_loan_receipts')
+                ->nullOnDelete();
+            $table->foreignId('book_item_id')->nullable()->constrained('book_items')->nullOnDelete();
             $table->date('loan_date');
             $table->date('due_date');
             $table->decimal('loan_price', 10, 2)->nullable();
@@ -18,8 +22,8 @@ return new class extends Migration {
         });
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         Schema::dropIfExists('book_loans');
     }
 };
-

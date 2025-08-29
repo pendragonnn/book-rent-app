@@ -62,7 +62,7 @@
               @if ($book->items->where('status', 'available')->count() > 0)
                 @php $item = $book->items->where('status', 'available')->first(); @endphp
                 <a href="{{ route('member.book-loans.create', $item->id) }}"
-                  class="inline-block bg-[#1B3C53] hover:bg-[#162f44] text-white text-sm px-4 py-2 rounded-full text-center">
+                  class="inline-block bg-blue-500 hover:bg-blue-600  text-white text-sm px-4 py-2 rounded-full text-center">
                   Borrow this book
                 </a>
               @else

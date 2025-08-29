@@ -5,24 +5,16 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
+    public function up(): void {
         Schema::create('book_loan_receipt_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('receipt_id')->constrained('book_loan_receipts')->cascadeOnDelete();
-            $table->foreignId('loan_id')->constrained('book_loans')->cascadeOnDelete();
+            $table->foreignId('receipt_id')->nullable()->constrained('book_loan_receipts')->nullOnDelete();
+            $table->foreignId('loan_id')->nullable()->constrained('book_loans')->nullOnDelete();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('book_loan_receipt_items');
     }
 };

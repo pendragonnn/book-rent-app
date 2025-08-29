@@ -14,9 +14,9 @@ return new class extends Migration {
             $table->string('publisher', 100)->nullable();
             $table->year('year')->nullable();
             $table->string('isbn', 50)->nullable();
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->decimal('rental_price', 10, 2);
-            $table->string('cover_image')->nullable();
+            $table->string('cover_image')->nullable(); // letakkan gambar di public/
             $table->timestamps();
         });
     }

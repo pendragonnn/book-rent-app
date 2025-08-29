@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('book_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_id')->constrained()->onDelete('cascade');
+            $table->foreignId('book_id')->nullable()->constrained('books')->nullOnDelete();;
             $table->enum('status', ['available', 'borrowed', 'lost', 'reserved'])->default('available');
             $table->timestamps();
         });
@@ -18,4 +18,3 @@ return new class extends Migration {
         Schema::dropIfExists('book_items');
     }
 };
-

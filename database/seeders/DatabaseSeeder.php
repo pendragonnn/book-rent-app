@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class, 
             BookSeeder::class, 
             BookItemSeeder::class,
-            BookLoanSeeder::class,
-            BookLoanReceiptSeeder::class,
+            // BookLoanSeeder::class,
+            // BookLoanReceiptSeeder::class,
         ]);
     }
 }

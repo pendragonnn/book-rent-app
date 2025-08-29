@@ -1,18 +1,36 @@
 <?php
+
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 
 class CategorySeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $categories = ['Fiction', 'Science', 'History', 'Technology', 'Children'];
+        $categories = [
+            ['name' => 'Technology'],
+            ['name' => 'Health & Wellness'],
+            ['name' => 'Education'],
+            ['name' => 'Sports & Fitness'],
+            ['name' => 'Food & Beverage'],
+            ['name' => 'Fashion'],
+            ['name' => 'Travel & Tourism'],
+            ['name' => 'Entertainment'],
+            ['name' => 'Business'],
+            ['name' => 'Automotive'],
+            ['name' => 'Real Estate'],
+            ['name' => 'Finance'],
+            ['name' => 'Arts & Culture'],
+            ['name' => 'Gaming'],
+            ['name' => 'Beauty & Skincare'],
+        ];
 
-        foreach ($categories as $name) {
-            Category::updateOrInsert(['name' => $name]);
-        }
+        DB::table('categories')->insert($categories);
     }
 }
-
