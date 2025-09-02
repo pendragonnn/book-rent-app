@@ -73,18 +73,23 @@ class DashboardController extends Controller
             });
 
         // Recent loans
-        $recentLoanActivities = BookLoan::with(['user'])
+        $recentLoanActivities = BookLoan::with(['user', 'receipts.user'])
             ->latest()
             ->take(2)
             ->get()
             ->map(function ($loan) {
+                // Get the user from receipts (if any)
+                $receiptUser = $loan->receipts->first() ? $loan->receipts->first()->user : null;
+
                 return [
                     'type' => 'loan',
                     'message' => "Book loan " . ($loan->status === 'returned' ? 'returned' : 'created'),
-                    'user' => $loan->user ? $loan->user->name : 'Unknown User',
+                    'user' => $receiptUser
+                        ? $receiptUser->name
+                        : ($loan->user ? $loan->user->name : 'Unknown User'),
                     'time' => $loan->updated_at,
                     'status' => $loan->status,
-                    'icon' => $loan->status === 'returned' ? 'check-circle' : 'book'
+                    'icon' => $loan->status === 'returned' ? 'check-circle' : 'book',
                 ];
             });
 

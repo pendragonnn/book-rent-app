@@ -19,7 +19,7 @@
 
         {{-- Password --}}
         <div>
-            <x-input-label for="password" :value="__('Kata Sandi')" class="text-[#442C1D] mb-2" />
+            <x-input-label for="password" :value="__('Password')" class="text-[#442C1D] mb-2" />
             <x-text-input id="password"
                 class="block w-full rounded-md border-[#D4C3B2] shadow-sm focus:border-[#C88A21] focus:ring-[#C88A21] custom-input-focus"
                 type="password" name="password" required autocomplete="current-password" />
@@ -31,13 +31,13 @@
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox"
                     class="rounded border-[#D4C3B2] text-[#442C1D] shadow-sm focus:ring-[#C88A21]" name="remember">
-                <span class="ms-2 text-sm text-[#6B5A4B]">{{ __('Ingat Saya') }}</span>
+                <span class="ms-2 text-sm text-[#6B5A4B]">{{ __('Remember Me') }}</span>
             </label>
 
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-[#C88A21] hover:text-[#9E6C36] rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus-ring-[#C88A21] transition-colors duration-200"
                     href="{{ route('password.request') }}">
-                    {{ __('Lupa Kata Sandi Anda?') }}
+                    {{ __('Forgot password?') }}
                 </a>
             @endif
         </div>
